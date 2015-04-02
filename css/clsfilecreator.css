@@ -1,0 +1,45 @@
+#sampleTable
+{
+    /*margin: 10px 5px 5px 15px;*/
+    font-size: 12px;
+}
+
+#sampleTable tr td
+{
+    padding: 10px;
+}
+
+#step-1 div {
+    margin: 0 auto;
+}
+
+.swMain .stepContainer div.content
+{
+    overflow:auto;
+}
+
+.swMain .stepContainer
+{
+    overflow-y: hidden;
+}
+
+/*input
+{
+    margin-right: 8px;
+}*/
+
+#sampleControls
+{
+    margin: 0 auto;
+    width: 300px;
+    font-size: 14px;
+    padding: 4px;
+}
+
+#samplesGrid
+{
+    height: 270px;
+    width: 300px;
+    z-index: 999999;
+}
+
