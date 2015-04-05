@@ -1,0 +1,97 @@
+<html>
+<head>
+    <!--<link rel="stylesheet" type="text/css" href="getFile.jsp?task=urn:lsid:broad.mit.edu:cancer.software.genepattern.module.visualizer:00261:999999999&file=normalize.css"/>
+    <link rel="stylesheet" type="text/css" href="getFile.jsp?task=urn:lsid:broad.mit.edu:cancer.software.genepattern.module.visualizer:00261:999999999&file=main.css"/>
+    <link rel="stylesheet" type="text/css" href="getFile.jsp?task=urn:lsid:broad.mit.edu:cancer.software.genepattern.module.visualizer:00261:999999999&file=jquery.steps.css"/> -->
+    <link rel="stylesheet" type="text/css" href="getFile.jsp?task=urn:lsid:broad.mit.edu:cancer.software.genepattern.module.visualizer:00261:999999999&file=smart_wizard.css"/>
+    <link rel="stylesheet" type="text/css" href="getFile.jsp?task=urn:lsid:broad.mit.edu:cancer.software.genepattern.module.visualizer:00261:999999999&file=w2ui-1.4.2.min.css"/>
+    <link rel="stylesheet" type="text/css" href="getFile.jsp?task=urn:lsid:broad.mit.edu:cancer.software.genepattern.module.visualizer:00261:999999999&file=clsfilecreator.css"/>
+
+    <!-- jQuery JS-->
+    <script src="//code.jquery.com/jquery-2.1.3.min.js"></script>
+    <script src="getFile.jsp?task=urn:lsid:broad.mit.edu:cancer.software.genepattern.module.visualizer:00261:999999999&file=jquery.smartWizard.js"></script>
+    <script src="getFile.jsp?task=urn:lsid:broad.mit.edu:cancer.software.genepattern.module.visualizer:00261:999999999&file=w2ui-1.4.2.js"></script>
+    <script src="getFile.jsp?task=urn:lsid:broad.mit.edu:cancer.software.genepattern.module.visualizer:00261:999999999&file=clsfilecreator.js"></script>
+</head>
+<body>
+
+
+<div id="creator" class="swMain">
+    <ul>
+        <li>
+            <a href="#step-1">
+            <label class="stepNumber">1</label>
+              <span class="stepDesc">
+                 Samples<br />
+                 <small>Select Samples</small>
+              </span>
+            </a>
+        </li>
+        <li>
+            <a href="#step-2">
+            <label class="stepNumber">2</label>
+              <span class="stepDesc">
+                 Classes<br />
+                 <small>Assign Classes to Samples</small>
+              </span>
+            </a>
+        </li>
+        <li>
+            <a href="#step-3">
+            <label class="stepNumber">3</label>
+              <span class="stepDesc">
+                 Summary<br />
+                 <small>Review class assignments</small>
+              </span>
+            </a>
+        </li>
+        <li>
+            <a href="#step-4">
+            <label class="stepNumber">4</label>
+              <span class="stepDesc">
+                 Save<br />
+                 <small>Create and save the CLS File</small>
+              </span>
+            </a>
+        </li>
+    </ul>
+
+    <div id="step-1">
+        <h2 class="StepTitle">Select the samples to include in the CLS file</h2>
+    </div>
+    <div id="step-2">
+        <h2 class="StepTitle">Define classes and specify class assignments</h2>
+        <div id="classesList">
+            <div>
+                <input placeholder="Enter class name" type="text" id="classInput"/>
+                <button id="classInputAdd">Add Class</button>
+            </div>
+
+            <div>
+                <select id="classSelection">
+                    <option>Please add samples</option>
+                </select>
+                <button id="assignClass">Assign Class</button>
+            </div>
+        </div>
+        <div id="classAssignments"></div>
+        <div id="samplesGrid"></div>
+    </div>
+    <div id="step-3">
+        <h2 class="StepTitle">Specify the classes and assign them to samples</h2>
+        <!-- step content -->
+        <p>
+            This is content 3
+        </p>
+    </div>
+    <div id="step-4">
+        <h2 class="StepTitle">Step 4 Title</h2>
+        <!-- step content -->
+        <p>
+            This is content 4
+        </p>
+    </div>
+</div>
+</body>
+
+</html>
