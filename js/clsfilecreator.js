@@ -1,8 +1,22 @@
 var sampleNamesList = [];
 var selectedSamplesList = [];
 var idIncrement = 0;
+var jobResultNumber = -1;
+
+
+if (typeof clsFileCreator === 'undefined') {
+    clsFileCreator = {};
+}
+clsFileCreator.Util = function() {};
+
+clsFileCreator.Util.endsWith = function(string, suffix) {
+    return string.length >= suffix.length
+        && string.substr(string.length - suffix.length) === suffix;
+};
+
 
 function parseQueryString() {
+    console.log("clsfilecreator url: " + window.location);
     var query = (window.location.search || '?').substr(1),
         map   = {};
     query.replace(/([^&=]+)=?([^&]*)(?:&+|$)/g, function(match, key, value) {
@@ -29,39 +43,6 @@ function generateNewId()
     return ++idIncrement;
 }
 
-/*function parseFile(file, callback) {
-    var fileSize   = file.size;
-    var chunkSize  = 64 * 1024; // bytes
-    var offset     = 0;
-    var self       = this; // we need a reference to the current object
-    var block      = null;
-
-    var foo = function(evt) {
-        if (evt.target.error == null) {
-            offset += evt.target.result.length;
-
-            callback(evt.target.result); // callback for handling read chunk
-        } else {
-            console.log("Read error: " + evt.target.error);
-            return;
-        }
-        if (offset >= fileSize) {
-            console.log("Done reading file");
-            return;
-        }
-
-        block(offset, chunkSize, file);
-    }
-
-    block = function(_offset, length, _file) {
-        var r = new FileReader();
-        var blob = _file.slice(_offset, length + _offset);
-        r.onload = foo;
-        r.readAsText(blob);
-    }
-
-    block(offset, chunkSize, file);
-}*/
 
 function parseGCTFile(fileURL) {
     $.ajax({
@@ -179,8 +160,6 @@ function listSamples(sampleNames)
 
 function displayStep2()
 {
-    var samplesList = $("#samplesGrid");
-
     var sampleRecords =  [];
     for(var s=0;s<selectedSamplesList.length;s++)
     {
@@ -190,103 +169,206 @@ function displayStep2()
     console.log("samples grid");
 
     //delete any existing samples grid
-    if( w2ui['samplesGrid'] !== undefined )
+    if( w2ui['sampleAndClassGrid'] !== undefined || w2ui['sampleAndClassGrid'] !== undefined)
     {
-        w2ui['samplesGrid'].destroy();
+        //w2ui['sampleAndClassGrid'].destroy();
+        return;
     }
 
-    $('#samplesGrid').w2grid({
-        name   : 'samplesGrid',
-        header: 'List of Samples',
+    //delete any existing classes grid
+    /*if( w2ui['classesGrid'] !== undefined )
+    {
+        w2ui['classesGrid'].destroy();
+    }*/
+
+    var btn = w2obj.grid.prototype.buttons;
+    delete btn['reload'];
+    //delete btn['columns'];
+
+
+    $('#sampleAndClassGrid').w2grid({
+        name   : 'sampleAndClassGrid',
+        header: 'Sample & Class Assignment',
         show: {
+            selectColumn: true,
             toolbar: true,
             footer: true,
-            header: true
+            header: true,
+            lineNumbers: true
         },
-        columns: [
-            { field: 'recid', caption: 'Index'}, {field: 'sample', caption: 'Sample Name', size: '100%' }
+        multiSearch: true,
+        searches: [
+            { field: 'sample', caption: 'Sample Name', type: 'text' },
+            { field: 'class', caption: 'Class', type: 'text' }
         ],
-        sortData: [{ field: 'recid', direction: 'ASC' }, { field: 'sample', direction: 'ASC' }],
+        columns: [
+            { field: 'recid', caption: 'Index', size: '1%'},
+            {field: 'sample', caption: 'Sample Name', size: '45%' },
+            {field: 'class', caption: 'Class', size: '45%'}
+        ],
+        sortData: [{ field: 'recid', direction: 'ASC' },
+            { field: 'sample', direction: 'ASC' },
+            { field: 'class', direction: 'ASC' }],
         records: sampleRecords
-     });
+    });
 
-    w2ui['samplesGrid'].hideColumn('recid');
+    w2ui['sampleAndClassGrid'].hideColumn('recid');
 
+   /* $('#sampleAndClassGrid').w2grid({
+        name   : 'sampleAndClassGrid',
+        show: {
+            footer: true,
+            selectColumn: true,
+            lineNumbers    : true
+        },
+        multiSelect : true,
+        columns: [
+            { field: 'recid', caption: 'Index'},
+            {field: 'class', caption: 'Class2', size: '100%', editable: false }
+        ],
+        sortData: [{ field: 'recid', direction: 'ASC' },
+            { field: 'class', direction: 'ASC' }]
+    });*/
 
-    $("#classInputAdd").click(function()
-    {
-        var newOption = $("<option/>");
-        var value = $("#classInput").val();
+    $('#classesGrid').w2grid({
+        name   : 'classesGrid',
+        show: {
+            footer: true,
+            selectColumn: true,
+            lineNumbers    : true
+        },
+        multiSelect : true,
+        columns: [
+            { field: 'recid', caption: 'Index'},
+            {field: 'class', caption: 'Class', size: '100%', editable: false }
+        ],
+        sortData: [{ field: 'recid', direction: 'ASC' },
+            { field: 'class', direction: 'ASC' }]
+    });
 
-        if(value !== undefined && value !== null && value.length > 0)
-        {
-            newOption.val(value);
-            newOption.text(value);
-            $("#classSelection").append(newOption);
-            $("#classSelection").val(value);
+    $('#assignClassDiv').w2toolbar({
+        name: 'assignClassDiv',
+        items: [
+            { type: 'button', id: 'assign', caption: 'Assign' }
+        ],
+        onClick: function (event) {
+            switch (event.target) {
+                case 'assign':
+                    var selectedClass = w2ui['classesGrid'].getSelection();
+
+                    for(var r=0;r<selectedClass.length;r++)
+                    {
+                        var className = w2ui['classesGrid'].get(selectedClass[r]).class;
+
+                        var selectedSamples = w2ui['sampleAndClassGrid'].getSelection();
+
+                        for(var s=0;s<selectedSamples.length;s++)
+                        {
+                            w2ui['sampleAndClassGrid'].set(selectedSamples[s], {class: className});
+                        }
+                    }
+                    break;
+            }
         }
     });
 
-    $("#assignClass").click(function()
-    {
-        //check if this class is already defined
-        var className = $("#classSelection").val();
-        var classNodeArray = w2ui['classAssignments'].find({ text: className });
-        var classId= null;
+    $('#classToolbar').w2toolbar({
+        name: 'classToolbar',
+        items: [
+            { type: 'html',  id: 'classInput',
+                html: '<div style="padding: 3px 10px;">'+
+                    //' Class:'+
+                    '    <input id= "classInput" style="padding: 3px; border-radius: 2px; border: 1px solid silver"/>'+
+                    '</div>'
+            },
+            { type: 'button', id: 'add', caption: 'Add', icon: 'w2ui-icon-plus' },
+            { type: 'break',  id: 'break1' },
+            { type: 'button', id: 'delete', caption: 'Delete', icon: 'w2ui-icon-cross' }//,
+            //{ type: 'break',  id: 'break2' },
+            //{ type: 'button', id: 'assign', caption: 'Assign', icon: 'w2ui-icon-cross' }
+        ],
+        onClick: function (event) {
+            switch (event.target) {
+                case 'add':
+                    var className = $("#classInput").val();
+                    if(className && className.length > 0)
+                    {
+                        w2ui['classesGrid'].add({ recid: generateNewId(),  class: className});
+                    }
+                    $("#classInput").val("");
+                    break;
+               /* case 'assign':
+                    var selectedClass = w2ui['classesGrid'].getSelection();
 
-        if(!classNodeArray || classNodeArray.length == 0)
-        {
-            classId = generateNewId();
-            classId = classId.toString();
-            w2ui['classAssignments'].add({ id: classId, text: className, expanded: true, group: true});
+                    for(var r=0;r<selectedClass.length;r++)
+                    {
+                        var className = w2ui['classesGrid'].get(selectedClass[r]).class;
+
+                        var selectedSamples = w2ui['sampleAndClassGrid'].getSelection();
+
+                        for(var s=0;s<selectedSamples.length;s++)
+                        {
+                            w2ui['sampleAndClassGrid'].set(selectedSamples[s], {class: className});
+                        }
+                    }
+                    break;*/
+                case 'delete':
+                    var selectedClasses = w2ui['classesGrid'].getSelection();
+
+                    for(var c=0;c<selectedClasses.length;c++)
+                    {
+                        w2ui['classesGrid'].remove(selectedClasses[c]) ;
+
+                        var assignSamples = w2ui['sampleAndClassGrid'].find(
+                            { class:  w2ui['sampleAndClassGrid'].get(selectedClasses[c]).class });
+                        for(var a=0;a<assignSamples.length;a++)
+                        {
+                            w2ui['sampleAndClassGrid'].set(assignSamples[a], {class: ''});
+                        }
+                    }
+
+                    break;
+            }
         }
-        else
-        {
-            //get class Id from node
-            classId = classNodeArray[0].id;
-            classId = classId.toString();
-        }
-
-        var selectedSamples = w2ui['samplesGrid'].getSelection();
-
-        //update the total sample count for class
-        //w2ui['classAssignments'].set(classId, { text: className + "(" + selectedSamples.length + ")"});
-        //w2ui['classAssignments'].set(classId, { count: selectedSamples.length.toString() });
-
-
-        for(var r=0;r<selectedSamples.length;r++)
-        {
-            var sampleName = w2ui['samplesGrid'].get(selectedSamples[r]).sample;
-            w2ui['classAssignments'].add(classId , [{id: generateNewId().toString(), text: sampleName}]);
-
-            //delete the record from the grid
-            w2ui['samplesGrid'].remove(selectedSamples[r]);
-        }
-
-    });
-
-    //display the tentative class assignments list
-    $('#classAssignments').w2sidebar({
-        name: 'classAssignments',
-        topHTML: '<div class="header">Class Assignments</div>'
-    });
-
-    w2ui['classAssignments'].on('dblClick', function(event) {
-        var node = event.object;
-        //remove the sample from the class
-       w2ui['classAssignments'].remove(node.id);
-
-       //update the total number of samples in node
-        var parent = node.parent;
-        if(parent)
-        {
-            w2ui['classAssignments'].set(parent.id, { count:  parent.nodes.length.toString() });
-        }
-
-       console.log(event);
-       //w2ui['samplesGrid'].add({ recid: node.id, sample: node.val });
     });
 }
+
+function classAssignmentsSummary()
+{
+    $('#classAssignmentSummary').w2sidebar({
+        name: 'classAssignmentSummary',
+        style: 'background-color: transparent !important;'//,
+        //topHTML: '<div class="header">Class Assignments</div>'
+    });
+
+    var classRecords =  w2ui['classesGrid'].records;
+    for(var r=0;r<classRecords.length;r++)
+    {
+        var className = classRecords[r].class;
+
+        var samplesList = "";//[];
+        var assignSamples = w2ui['sampleAndClassGrid'].find(
+            { class:  className });
+
+        w2ui['classAssignmentSummary'].add({ id: r.toString(), text: "Class: " + className + "("+ assignSamples.length +")", expanded: true, group: true});
+
+        for(var a=0;a<assignSamples.length;a++)
+        {
+            if(a != 0)
+            {
+                samplesList += ", ";
+            }
+            samplesList += w2ui['sampleAndClassGrid'].get(assignSamples[a]).sample;
+        }
+
+        if(samplesList.length > 0)
+        {
+            w2ui['classAssignmentSummary'].add(r.toString(), [{ id: r.toString() + "-" + a.toString(),
+                    text:  samplesList}]);
+        }
+    }
+}
+
 
 $(function()
 {
@@ -308,16 +390,43 @@ $(function()
 
             return true;
         },
+        onFinish: function(obj, context)
+        {
+            //save the cls file to the job result
+
+            var clsFileName = $("#clsFileName").val();
+
+            var text = "this is a test cls";
+
+            var blob = new Blob([ text ], {
+                type : "text/plain;charset=utf-8"
+            });
+            if (clsFileCreator.Util.endsWith(clsFileName.toLowerCase(), '.cls')) {
+                clsFileName += '.gct';
+            }
+            saveAs(blob, clsFileName);
+
+            $("#creator").smartWizard('showMessage', 'File saved to job result ' + jobResultNumber);
+
+            return true;
+
+        },
         onShowStep : function(obj, context)
         {
             if(context.toStep == 2)
             {
                 displayStep2();
             }
+            if(context.toStep == 3)
+            {
+                classAssignmentsSummary();
+            }
         }
     });
 
     var requestParams = parseQueryString();
+
+    jobResultNumber = requestParams["job.number"];
 
     var inputFiles = requestParams["input.file"];
     if(inputFiles == null)

@@ -1,6 +1,5 @@
 #sampleTable
 {
-    /*margin: 10px 5px 5px 15px;*/
     font-size: 12px;
 }
 
@@ -23,11 +22,6 @@
     overflow-y: hidden;
 }
 
-/*input
-{
-    margin-right: 8px;
-}*/
-
 #sampleControls
 {
     margin: 0 auto;
@@ -36,10 +30,128 @@
     padding: 4px;
 }
 
-#samplesGrid
+#sampleAndClassGrid
 {
-    height: 270px;
-    width: 300px;
-    z-index: 999999;
+    height: 262px;
+    width: 530px;
+    float: right;
+    margin-top: 6px;
 }
+
+#classesMainDiv
+{
+    float: left;
+}
+
+#classesGrid
+{
+    height: 225px;
+    width:  335px; /* 395px; */
+    float: left;
+    /*margin-top: 6px;*/
+    margin-right: 15px;
+}
+
+#classToolbar
+{
+    margin-top: 6px;
+    width: 335px; /*395px;*/
+}
+
+#assignClassDiv
+{
+    /*height: 262px;*/
+    width: 65px;
+    float: left;
+    margin-top: 110px;
+    margin-left: 4px;
+}
+
+#classAssignmentSummary
+{
+    width: 900px;
+    height: 262px;
+    /*float: right;*/
+    margin-left: 10px;
+    margin-top: 6px;
+    background-color: transparent !important;
+}
+
+/*#assignClassDiv
+{
+    height: 90px;
+    width: 100px;
+    float: left;
+}*/
+
+#classAssignments
+{
+    width: 330px;
+    height: 262px;
+    float: right;
+    margin-left: 10px;
+    margin-top: 6px;
+}
+
+#classesList
+{
+    float: left;
+    margin-top: 70px;
+    width: 250px;
+    /*display: block;*/
+    margin-left: 10px; /*55px;*/
+    margin-right: 5px;
+}
+
+#classesList input
+{
+    width: 170px;
+}
+
+#classesList div
+{
+    margin-top: 10px;
+}
+
+#saveCLS
+{
+    width: 400px;
+    height: 200px;
+    margin: auto;
+    font-size: 14px;
+    font-weight: bold;
+
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+}
+
+#saveCLS input
+{
+    width: 200px;
+}
+
+.header
+{
+    border-bottom: 1px solid #99bbe8 !important;
+    height: 28px;
+    overflow: hidden;
+    color: #444444;
+    font-size: 13px;
+    text-align: center;
+    padding: 7px;
+    background-image: -webkit-linear-gradient(#dae6f3, #c2d5ed);
+    background-image: -moz-linear-gradient(#dae6f3, #c2d5ed);
+    background-image: -ms-linear-gradient(#dae6f3, #c2d5ed);
+    background-image: -o-linear-gradient(#dae6f3, #c2d5ed);
+    background-image: linear-gradient(#dae6f3, #c2d5ed);
+    filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ffdae6f3', endColorstr='#ffc2d5ed', GradientType=0);
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    width: 420px;
+}
+
+
+
+
+
 

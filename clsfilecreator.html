@@ -11,6 +11,7 @@
     <script src="//code.jquery.com/jquery-2.1.3.min.js"></script>
     <script src="getFile.jsp?task=urn:lsid:broad.mit.edu:cancer.software.genepattern.module.visualizer:00261:999999999&file=jquery.smartWizard.js"></script>
     <script src="getFile.jsp?task=urn:lsid:broad.mit.edu:cancer.software.genepattern.module.visualizer:00261:999999999&file=w2ui-1.4.2.js"></script>
+    <script src="getFile.jsp?task=urn:lsid:broad.mit.edu:cancer.software.genepattern.module.visualizer:00261:999999999&file=FileSaver.js"></script>
     <script src="getFile.jsp?task=urn:lsid:broad.mit.edu:cancer.software.genepattern.module.visualizer:00261:999999999&file=clsfilecreator.js"></script>
 </head>
 <body>
@@ -61,7 +62,7 @@
     </div>
     <div id="step-2">
         <h2 class="StepTitle">Define classes and specify class assignments</h2>
-        <div id="classesList">
+        <!--<div id="classesList">
             <div>
                 <input placeholder="Enter class name" type="text" id="classInput"/>
                 <button id="classInputAdd">Add Class</button>
@@ -73,23 +74,30 @@
                 </select>
                 <button id="assignClass">Assign Class</button>
             </div>
+        </div>-->
+
+        <!--<div id="classAssignments"></div>-->
+        <div id="classesMainDiv">
+            <div id="classToolbar" style="padding: 4px; border: 1px solid silver; border-radius: 3px"></div>
+            <div id="classesGrid"></div>
         </div>
-        <div id="classAssignments"></div>
-        <div id="samplesGrid"></div>
+        <div id="assignClassDiv" style="padding: 4px; border: 1px solid silver; border-radius: 3px"></div>
+        <div id="sampleAndClassGrid"></div>
+
+
     </div>
     <div id="step-3">
-        <h2 class="StepTitle">Specify the classes and assign them to samples</h2>
+        <h2 class="StepTitle">Class Assignment Summary</h2>
         <!-- step content -->
-        <p>
-            This is content 3
-        </p>
+        <div id="classAssignmentSummary"></div>
     </div>
     <div id="step-4">
-        <h2 class="StepTitle">Step 4 Title</h2>
+        <h2 class="StepTitle">Save CLS file</h2>
         <!-- step content -->
-        <p>
-            This is content 4
-        </p>
+        <div id="saveCLS">
+            <label for="clsFileName">Enter file name:</label>
+            <input type="text" id="clsFileName"/>
+        </div>
     </div>
 </div>
 </body>
