@@ -1,0 +1,32 @@
+#ClsFileCreator
+#Wed Apr 08 13:14:00 EDT 2015
+JVMLevel=
+LSID=urn\:lsid\:broad.mit.edu\:cancer.software.genepattern.module.visualizer\:00261\:999999999
+author=Marc-Danie Nazaire(Broad Institute)
+categories=JsViewer
+commandLine=clsfilecreator.html ? <input.file>
+cpuType=any
+description=A tool to create a class label (CLS) file.
+fileFormat=
+language=Java
+name=ClsFileCreator
+os=any
+p1_MODE=IN
+p1_TYPE=FILE
+p1_default_value=
+p1_description=A dataset - .gct, .res
+p1_fileFormat=gct;res
+p1_name=input.file
+p1_optional=
+p1_prefix_when_specified=
+p1_type=java.io.File
+p1_value=
+pipelineModel=
+privacy=public
+publicationDate=04/08/2015 13\:04 
+quality=production
+serializedModel=
+taskDoc=doc.html
+taskType=Visualizer
+userid=GenePattern (gp-help@broadinstitute.org)
+version=Modified to be a javascript visualizer
