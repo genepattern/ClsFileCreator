@@ -2,14 +2,15 @@ var sampleNamesList = [];
 var selectedSamplesList = [];
 var idIncrement = 0;
 var jobResultNumber = -1;
+var classNamesList = [];
 
 
-if (typeof clsFileCreator === 'undefined') {
-    clsFileCreator = {};
+if (typeof gp === 'undefined') {
+    gp = {};
 }
-clsFileCreator.Util = function() {};
+gp.Util = function() {};
 
-clsFileCreator.Util.endsWith = function(string, suffix) {
+gp.Util.endsWith = function(string, suffix) {
     return string.length >= suffix.length
         && string.substr(string.length - suffix.length) === suffix;
 };
@@ -175,16 +176,9 @@ function displayStep2()
         return;
     }
 
-    //delete any existing classes grid
-    /*if( w2ui['classesGrid'] !== undefined )
-    {
-        w2ui['classesGrid'].destroy();
-    }*/
-
     var btn = w2obj.grid.prototype.buttons;
     delete btn['reload'];
-    //delete btn['columns'];
-
+    delete btn['columns'];
 
     $('#sampleAndClassGrid').w2grid({
         name   : 'sampleAndClassGrid',
@@ -214,22 +208,6 @@ function displayStep2()
 
     w2ui['sampleAndClassGrid'].hideColumn('recid');
 
-   /* $('#sampleAndClassGrid').w2grid({
-        name   : 'sampleAndClassGrid',
-        show: {
-            footer: true,
-            selectColumn: true,
-            lineNumbers    : true
-        },
-        multiSelect : true,
-        columns: [
-            { field: 'recid', caption: 'Index'},
-            {field: 'class', caption: 'Class2', size: '100%', editable: false }
-        ],
-        sortData: [{ field: 'recid', direction: 'ASC' },
-            { field: 'class', direction: 'ASC' }]
-    });*/
-
     $('#classesGrid').w2grid({
         name   : 'classesGrid',
         show: {
@@ -246,30 +224,51 @@ function displayStep2()
             { field: 'class', direction: 'ASC' }]
     });
 
-    $('#assignClassDiv').w2toolbar({
-        name: 'assignClassDiv',
-        items: [
-            { type: 'button', id: 'assign', caption: 'Assign' }
-        ],
-        onClick: function (event) {
-            switch (event.target) {
-                case 'assign':
-                    var selectedClass = w2ui['classesGrid'].getSelection();
+    $("#assignClassBtn").click(function()
+    {
+        var selectedClass = w2ui['classesGrid'].getSelection();
 
-                    for(var r=0;r<selectedClass.length;r++)
-                    {
-                        var className = w2ui['classesGrid'].get(selectedClass[r]).class;
+        //should only be one class selected
+        if(selectedClass.length == 0)
+        {
+            w2popup.open({
+                title: 'Class Assignment',
+                body: '<div class="w2ui-centered">Please select a class!</div>'
+            });
 
-                        var selectedSamples = w2ui['sampleAndClassGrid'].getSelection();
+            return;
+        }
 
-                        for(var s=0;s<selectedSamples.length;s++)
-                        {
-                            w2ui['sampleAndClassGrid'].set(selectedSamples[s], {class: className});
-                        }
-                    }
-                    break;
+        if(selectedClass.length > 1)
+        {
+            w2popup.open({
+                title: 'Class Assignment',
+                body: '<div class="w2ui-centered">Only one class can be selected!</div>'
+            });
+
+            return;
+        }
+
+        for(var r=0;r<selectedClass.length;r++)
+        {
+            var className = w2ui['classesGrid'].get(selectedClass[r]).class;
+
+            //add the class to the list if it is not already there
+            if($.inArray(className, classNamesList) == -1)
+            {
+                classNamesList.push(className);
+            }
+
+            var selectedSamples = w2ui['sampleAndClassGrid'].getSelection();
+
+            for(var s=0;s<selectedSamples.length;s++)
+            {
+                w2ui['sampleAndClassGrid'].set(selectedSamples[s], {class: className});
             }
         }
+
+        w2ui['sampleAndClassGrid'].selectNone();
+        w2ui['classesGrid'].selectNone();
     });
 
     $('#classToolbar').w2toolbar({
@@ -284,8 +283,6 @@ function displayStep2()
             { type: 'button', id: 'add', caption: 'Add', icon: 'w2ui-icon-plus' },
             { type: 'break',  id: 'break1' },
             { type: 'button', id: 'delete', caption: 'Delete', icon: 'w2ui-icon-cross' }//,
-            //{ type: 'break',  id: 'break2' },
-            //{ type: 'button', id: 'assign', caption: 'Assign', icon: 'w2ui-icon-cross' }
         ],
         onClick: function (event) {
             switch (event.target) {
@@ -293,31 +290,34 @@ function displayStep2()
                     var className = $("#classInput").val();
                     if(className && className.length > 0)
                     {
-                        w2ui['classesGrid'].add({ recid: generateNewId(),  class: className});
+                        //only add this class if it does not already exist
+                        if(w2ui['classesGrid'].find({ class:  className }) == 0)
+                        {
+                            w2ui['classesGrid'].add({ recid: generateNewId(),  class: className});
+                        }
+                        else
+                        {
+                            w2popup.open({
+                                title: 'Add Class',
+                                body: '<div class="w2ui-centered"> The class ' +
+                                    className + ' already exists. </div>',
+                                width: '250',
+                                height: '120',
+                                modal: false
+                            });
+                        }
                     }
                     $("#classInput").val("");
                     break;
-               /* case 'assign':
-                    var selectedClass = w2ui['classesGrid'].getSelection();
-
-                    for(var r=0;r<selectedClass.length;r++)
-                    {
-                        var className = w2ui['classesGrid'].get(selectedClass[r]).class;
-
-                        var selectedSamples = w2ui['sampleAndClassGrid'].getSelection();
-
-                        for(var s=0;s<selectedSamples.length;s++)
-                        {
-                            w2ui['sampleAndClassGrid'].set(selectedSamples[s], {class: className});
-                        }
-                    }
-                    break;*/
                 case 'delete':
                     var selectedClasses = w2ui['classesGrid'].getSelection();
 
                     for(var c=0;c<selectedClasses.length;c++)
                     {
                         w2ui['classesGrid'].remove(selectedClasses[c]) ;
+
+                        //remove the class from the list of assign classes
+                        delete classNamesList[classNamesList.indexOf(selectedClasses[c]).class];
 
                         var assignSamples = w2ui['sampleAndClassGrid'].find(
                             { class:  w2ui['sampleAndClassGrid'].get(selectedClasses[c]).class });
@@ -338,7 +338,6 @@ function classAssignmentsSummary()
     $('#classAssignmentSummary').w2sidebar({
         name: 'classAssignmentSummary',
         style: 'background-color: transparent !important;'//,
-        //topHTML: '<div class="header">Class Assignments</div>'
     });
 
     var classRecords =  w2ui['classesGrid'].records;
@@ -350,7 +349,7 @@ function classAssignmentsSummary()
         var assignSamples = w2ui['sampleAndClassGrid'].find(
             { class:  className });
 
-        w2ui['classAssignmentSummary'].add({ id: r.toString(), text: "Class: " + className + "("+ assignSamples.length +")", expanded: true, group: true});
+        w2ui['classAssignmentSummary'].add({ id: r.toString(), text: "Class: " + className + " ("+ assignSamples.length +")", expanded: true, group: true});
 
         for(var a=0;a<assignSamples.length;a++)
         {
@@ -365,16 +364,63 @@ function classAssignmentsSummary()
         {
             w2ui['classAssignmentSummary'].add(r.toString(), [{ id: r.toString() + "-" + a.toString(),
                     text:  samplesList}]);
+
+            //w2ui['classAssignmentSummary'].disable(r.toString() + "-" + a.toString());
         }
     }
 }
 
+function createCls()
+{
+    var text = selectedSamplesList.length + " " + classNamesList.length + " 1" + "\n";
+    text += "#";
+
+    for(var c=0;c<classNamesList.length; c++)
+    {
+        text += " " + classNamesList[c];
+    }
+    text += "\n";
+
+    var sampleRecords = w2ui['sampleAndClassGrid'].records;
+    for(var s=0;s<sampleRecords.length;s++)
+    {
+        var className = sampleRecords[s].class;
+        var index = classNamesList.indexOf(className);
+        if(index < 0)
+        {
+            w2popup.open({
+                title: 'Create CLS File',
+                body: '<div class="w2ui-centered">An error occurred while creating CLS file. ' +
+                    'The class '+ className + ' was not found. </div>'
+            });
+
+            return;
+        }
+
+        if(s !== 0)
+        {
+            text += " ";
+        }
+        text += index;
+    }
+    return text;
+}
+
+function downloadFile(fileName, contents)
+{
+    var blob = new Blob([ contents ], {
+        type : "text/plain;charset=utf-8"
+    });
+    if (!gp.Util.endsWith(fileName.toLowerCase(), '.cls')) {
+        fileName += '.cls';
+    }
+    saveAs(blob, fileName);
+}
 
 $(function()
 {
     $("#creator").smartWizard({
         labelFinish: "Save",
-        //enableFinishButton: true,
         onLeaveStep : function(obj, context)
         {
             if(context.fromStep == 1)
@@ -382,12 +428,34 @@ $(function()
                 if (selectedSamplesList.length == 0)
                 {
                     $("#creator").smartWizard("showError", 1);
-                    $("#creator").smartWizard('showMessage', 'Please select some samples!');
+                    $("#creator").smartWizard('showMessage', 'Error: Please select some samples!');
                     return false;
                 }
             }
 
+            if(context.fromStep == 2)
+            {
+                //check if any samples do not have a class assignment
+                var records = w2ui['sampleAndClassGrid'].records;
 
+                var unClassifiedSamples = [];
+                for(var r=0;r<records.length;r++) {
+                    if (!records[r].class || records[r].class.length == 0) {
+                        unClassifiedSamples.push(records[r].sample);
+                        w2ui['sampleAndClassGrid'].select(records[r].recid);
+                    }
+                }
+
+                if(unClassifiedSamples.length > 0)
+                {
+                    $("#creator").smartWizard("showError", 2);
+                    $("#creator").smartWizard('showMessage', 'Error: There are ' + unClassifiedSamples.length + " samples with no class.");
+                    return false;
+                }
+            }
+
+            $("#creator").smartWizard("hideError");
+            $("#creator").smartWizard("hideMessage");
             return true;
         },
         onFinish: function(obj, context)
@@ -397,14 +465,10 @@ $(function()
             var clsFileName = $("#clsFileName").val();
 
             var text = "this is a test cls";
+            text = createCls();
+            console.log(text);
 
-            var blob = new Blob([ text ], {
-                type : "text/plain;charset=utf-8"
-            });
-            if (clsFileCreator.Util.endsWith(clsFileName.toLowerCase(), '.cls')) {
-                clsFileName += '.gct';
-            }
-            saveAs(blob, clsFileName);
+            downloadFile(clsFileName, text);
 
             $("#creator").smartWizard('showMessage', 'File saved to job result ' + jobResultNumber);
 

@@ -33,7 +33,7 @@
 #sampleAndClassGrid
 {
     height: 262px;
-    width: 530px;
+    width: 522px;
     float: right;
     margin-top: 6px;
 }
@@ -60,16 +60,14 @@
 
 #assignClassDiv
 {
-    /*height: 262px;*/
     width: 65px;
     float: left;
     margin-top: 110px;
-    margin-left: 4px;
 }
 
 #classAssignmentSummary
 {
-    width: 900px;
+    width: 950px;
     height: 262px;
     /*float: right;*/
     margin-left: 10px;
@@ -77,47 +75,12 @@
     background-color: transparent !important;
 }
 
-/*#assignClassDiv
-{
-    height: 90px;
-    width: 100px;
-    float: left;
-}*/
-
-#classAssignments
-{
-    width: 330px;
-    height: 262px;
-    float: right;
-    margin-left: 10px;
-    margin-top: 6px;
-}
-
-#classesList
-{
-    float: left;
-    margin-top: 70px;
-    width: 250px;
-    /*display: block;*/
-    margin-left: 10px; /*55px;*/
-    margin-right: 5px;
-}
-
-#classesList input
-{
-    width: 170px;
-}
-
-#classesList div
-{
-    margin-top: 10px;
-}
-
 #saveCLS
 {
     width: 400px;
     height: 200px;
-    margin: auto;
+    margin-left: auto;
+    margin-right: auto;
     font-size: 14px;
     font-weight: bold;
 
@@ -127,6 +90,8 @@
 
 #saveCLS input
 {
+    margin-top: 120px;
+    margin-left: 4px;
     width: 200px;
 }
 
@@ -148,6 +113,11 @@
     border-top-left-radius: 2px;
     border-top-right-radius: 2px;
     width: 420px;
+}
+
+.w2ui-node-caption
+{
+    white-space: normal !important;
 }
 
 
