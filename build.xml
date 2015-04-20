@@ -1,22 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Ant build file -->
 
-<project basedir="" default="package" name="ClsFileCreator">
+<project basedir="" default="create-zip" name="ClsFileCreator">
     <property name="dirOffset" value="../common_module_code" />
     <import file="${dirOffset}/commontargets.xml" />
-
-
 
     <target name="create-zip" depends="init">
         <antcall target="prezip"/>
         <zip destfile="${dest.dir}/${ant.project.name}.zip" whenempty="fail" defaultexcludes="true">
             <fileset dir="." includes="clsfilecreator.html, manifest, doc.html"/>
-            <fileset dir="js" includes="*.js"/>
-            <fileset dir="css" includes="*.css"/>
-            <zipfileset dir="images" prefix="images"/>
+            <zipfileset dir="js" prefix="js" includes="*.js"/>
+            <zipfileset dir="css" prefix="css" includes="*.css"/>
+            <zipfileset prefix="images" dir="images"/>
         </zip>
         <antcall target="postzip"/>
     </target>
-
 
 </project>

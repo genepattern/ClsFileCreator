@@ -15,39 +15,69 @@
 .swMain .stepContainer div.content
 {
     overflow:auto;
+    width: 100%;
 }
 
 .swMain .stepContainer
 {
     overflow-y: hidden;
+    width: 100%;
 }
 
 #sampleControls
 {
     margin: 0 auto;
-    width: 300px;
+    width: 1170px;
     font-size: 14px;
     padding: 4px;
+}
+
+#sampleGrid
+{
+    height: 262px;
+    width: 300px;
+    float: left;
+    margin-top: 6px;
 }
 
 #sampleAndClassGrid
 {
     height: 262px;
-    width: 522px;
-    float: right;
+    width: 320px;
+    float: left;
     margin-top: 6px;
+    margin-left: 4px;
 }
 
-#classesMainDiv
+
+#classEntry
 {
     float: left;
+    margin-top: 80px;
+    margin-left: 20px;
+}
+
+#assignClassBtn
+{
+    margin-left: 10px;
+    float: left;
+}
+
+#className
+{
+    width: 240px;
+}
+
+#classesTableDiv
+{
+    /*float: right;*/
 }
 
 #classesGrid
 {
     height: 225px;
-    width:  335px; /* 395px; */
-    float: left;
+    width:  600px; /*335px;*/ /* 395px; */
+    /*float: left;*/
     /*margin-top: 6px;*/
     margin-right: 15px;
 }
@@ -55,7 +85,7 @@
 #classToolbar
 {
     margin-top: 6px;
-    width: 335px; /*395px;*/
+    width: 600px; /*395px;*/
 }
 
 #assignClassDiv
@@ -69,7 +99,6 @@
 {
     width: 950px;
     height: 262px;
-    /*float: right;*/
     margin-left: 10px;
     margin-top: 6px;
     background-color: transparent !important;
@@ -81,19 +110,45 @@
     height: 200px;
     margin-left: auto;
     margin-right: auto;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: bold;
-
-    position: absolute;
-    top: 0; left: 0; bottom: 0; right: 0;
+    margin-top: 50px;
 }
 
+#saveCLS div
+{
+    margin-top: 15px;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 12px;
+    font-weight: normal;
+    /*padding: 8px;*/
+}
+
+#saveCLS input[type=text]
+{
+    width: 180px;
+}
+
+#saveCLS input[type=radio]
+{
+    padding: 8px;
+    margin-top: 6px;
+}
+
+#selectGpDir
+{
+    margin-top: 5px;
+    padding: 2px;
+}
+
+/*
 #saveCLS input
 {
-    margin-top: 120px;
+    margin-top: 50px;
     margin-left: 4px;
     width: 200px;
-}
+}*/
 
 .header
 {
@@ -119,6 +174,53 @@
 {
     white-space: normal !important;
 }
+
+.swMain {
+    width: 1155px;
+    padding: 0;
+    margin: 0;
+}
+
+
+.swMain ul.anchor li a .stepNumber
+{
+    font: bold 34px Verdana, Arial, Helvetica, sans-serif;
+    width: 21px;
+}
+
+.swMain .stepContainer .StepTitle {
+    font: bold 15px Verdana, Arial, Helvetica, sans-serif;
+    padding:3px;
+}
+
+.swMain ul.anchor li a {
+    height:51px;
+    width:215px;
+}
+
+.swMain ul.anchor li a .stepDesc{
+    font: bold 15px Verdana, Arial, Helvetica, sans-serif;
+}
+.swMain ul.anchor li a .stepDesc small{
+    font: normal 12px Verdana, Arial, Helvetica, sans-serif;
+}
+
+button.btn
+{
+    cursor: pointer;
+}
+
+#creator{
+    border: 2px solid blue;
+}
+
+
+.w2ui-tag .w2ui-tag-body
+{
+    background-color: red;
+}
+
+
 
 
 

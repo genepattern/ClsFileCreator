@@ -3,7 +3,6 @@
 JVMLevel=
 LSID=urn\:lsid\:broad.mit.edu\:cancer.software.genepattern.module.visualizer\:00261\:999999999
 author=Marc-Danie Nazaire(Broad Institute)
-categories=JsViewer
 commandLine=clsfilecreator.html ? <input.file>
 cpuType=any
 description=A tool to create a class label (CLS) file.
@@ -27,6 +26,6 @@ publicationDate=04/08/2015 13\:04
 quality=production
 serializedModel=
 taskDoc=doc.html
-taskType=Visualizer
+taskType=javascript
 userid=GenePattern (gp-help@broadinstitute.org)
 version=Modified to be a javascript visualizer

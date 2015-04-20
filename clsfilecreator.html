@@ -1,18 +1,17 @@
 <html>
 <head>
-    <!--<link rel="stylesheet" type="text/css" href="getFile.jsp?task=urn:lsid:broad.mit.edu:cancer.software.genepattern.module.visualizer:00261:999999999&file=normalize.css"/>
-    <link rel="stylesheet" type="text/css" href="getFile.jsp?task=urn:lsid:broad.mit.edu:cancer.software.genepattern.module.visualizer:00261:999999999&file=main.css"/>
-    <link rel="stylesheet" type="text/css" href="getFile.jsp?task=urn:lsid:broad.mit.edu:cancer.software.genepattern.module.visualizer:00261:999999999&file=jquery.steps.css"/> -->
-    <link rel="stylesheet" type="text/css" href="getFile.jsp?task=urn:lsid:broad.mit.edu:cancer.software.genepattern.module.visualizer:00261:999999999&file=smart_wizard.css"/>
-    <link rel="stylesheet" type="text/css" href="getFile.jsp?task=urn:lsid:broad.mit.edu:cancer.software.genepattern.module.visualizer:00261:999999999&file=w2ui-1.4.2.min.css"/>
-    <link rel="stylesheet" type="text/css" href="getFile.jsp?task=urn:lsid:broad.mit.edu:cancer.software.genepattern.module.visualizer:00261:999999999&file=clsfilecreator.css"/>
+    <link rel="stylesheet" type="text/css" href="css/smart_wizard.css"/>
+    <link rel="stylesheet" type="text/css" href="css/w2ui-1.4.2.css"/>
+    <link rel="stylesheet" type="text/css" href="css/clsfilecreator.css"/>
 
     <!-- jQuery JS-->
     <script src="//code.jquery.com/jquery-2.1.3.min.js"></script>
-    <script src="getFile.jsp?task=urn:lsid:broad.mit.edu:cancer.software.genepattern.module.visualizer:00261:999999999&file=jquery.smartWizard.js"></script>
-    <script src="getFile.jsp?task=urn:lsid:broad.mit.edu:cancer.software.genepattern.module.visualizer:00261:999999999&file=w2ui-1.4.2.js"></script>
-    <script src="getFile.jsp?task=urn:lsid:broad.mit.edu:cancer.software.genepattern.module.visualizer:00261:999999999&file=FileSaver.min.js"></script>
-    <script src="getFile.jsp?task=urn:lsid:broad.mit.edu:cancer.software.genepattern.module.visualizer:00261:999999999&file=clsfilecreator.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+    <script src="js/jquery.smartWizard.js"></script>
+    <script src="js/w2ui-1.4.2.js"></script>
+    <script src="js/FileSaver.min.js"></script>
+    <script src="js/gp_lib.js"></script>
+    <script src="js/clsfilecreator.js"></script>
 </head>
 <body>
 
@@ -32,8 +31,8 @@
             <a href="#step-2">
             <label class="stepNumber">2</label>
               <span class="stepDesc">
-                 Classes<br />
-                 <small>Assign Classes to Samples</small>
+                 Define Classes<br />
+                 <small>Define the class</small>
               </span>
             </a>
         </li>
@@ -41,14 +40,23 @@
             <a href="#step-3">
             <label class="stepNumber">3</label>
               <span class="stepDesc">
+                 Assign Classes<br />
+                 <small>Assign samples to classes</small>
+              </span>
+            </a>
+        </li>
+        <li>
+            <a href="#step-4">
+                <label class="stepNumber">4</label>
+              <span class="stepDesc">
                  Summary<br />
                  <small>Review class assignments</small>
               </span>
             </a>
         </li>
         <li>
-            <a href="#step-4">
-            <label class="stepNumber">4</label>
+            <a href="#step-5">
+            <label class="stepNumber">5</label>
               <span class="stepDesc">
                  Save<br />
                  <small>Create and save the CLS File</small>
@@ -62,30 +70,60 @@
     </div>
 
     <div id="step-2">
-        <h2 class="StepTitle">Define classes and specify class assignments</h2>
+        <h2 class="StepTitle">Define the classes</h2>
 
         <div id="classesMainDiv">
-            <div id="classToolbar" style="padding: 4px; border: 1px solid silver; border-radius: 3px"></div>
-            <div id="classesGrid"></div>
+            <!--<div id="classEntry">
+                <label for="className">Class:</label>
+                <input type="text" placeholder="Enter class name" id="className"/>
+                <button id="addClass"> Add </button>
+            </div>-->
+            <div id="classesTableDiv">
+                <div id="classToolbar" style="padding: 4px; border: 1px solid silver; border-radius: 3px"></div>
+                <div id="classesGrid"></div>
+            </div>
         </div>
+
+    </div>
+
+    <div id="step-3">
+        <h2 class="StepTitle">Assign the samples to classes</h2>
+        <!-- step content -->
+        <div id="sampleGrid"></div>
+
         <div id="assignClassDiv" class="w2ui-button">
-            <button id="assignClassBtn" class="btn">Assign</button>
+            <!--<button id="assignClassBtn" class="btn">Assign</button>-->
+            <img src="images/green_white_right_arrow.png" id="assignClassBtn" height="40" width="50"/>
+        </div>
+
+        <div class="w2ui-field w2ui-span3">
+            <div>
+                <input type="list" id="selectedClass">
+            </div>
         </div>
         <div id="sampleAndClassGrid"></div>
     </div>
 
-    <div id="step-3">
+    <div id="step-4">
         <h2 class="StepTitle">Class Assignment Summary</h2>
         <!-- step content -->
         <div id="classAssignmentSummary"></div>
     </div>
 
-    <div id="step-4">
+    <div id="step-5">
         <h2 class="StepTitle">Save CLS file</h2>
         <!-- step content -->
         <div id="saveCLS">
             <label for="clsFileName">Enter file name:</label>
             <input type="text" id="clsFileName"/>
+            <div>
+                <label><input type="radio" name="saveMethod" value="gp"/>Save file to GenePattern Files Tab </label>
+                <div id="selectGpDir">
+                    <span id="selectedDir"></span><button id="gpDir" class="btn">Select directory</button>
+                </div>
+                <br/>
+                <label><input type="radio" name="saveMethod" value="download"/>Download file</label><br/>
+            </div>
         </div>
     </div>
 </div>
