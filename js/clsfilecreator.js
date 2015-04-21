@@ -139,22 +139,6 @@ function listSamples(sampleNames)
         }
 
     }
-    /*for(var i=0;i<sampleNames.length;i++)
-    {
-        if(i%4 == 0)
-        {
-            tableRow = $("<tr/>");
-            table.append(tableRow);
-        }
-
-        tableRow.append("<td>" + i + ".</td>");
-
-        var checkBox = $("<input type='checkbox'/>");
-        var tableData = $("<td/>");
-        tableData.append(checkBox);
-        tableData.append(sampleNames[i]);
-        tableRow.append(tableData);
-    }*/
 
     var div = $("<div/>");
     div.append(table);
@@ -168,6 +152,11 @@ function defineClasses()
     for(var s=0;s<selectedSamplesList.length;s++)
     {
         sampleRecords.push({ recid: s, sample: selectedSamplesList[s]});
+    }
+
+    if( w2ui['classesGrid'] !== undefined)
+    {
+        w2ui['classesGrid'].destroy();
     }
 
     var btn = w2obj.grid.prototype.buttons;
@@ -190,71 +179,68 @@ function defineClasses()
             { field: 'class', direction: 'ASC' }]
     });
 
-    $('#classToolbar').w2toolbar({
-        name: 'classToolbar',
-        items: [
-            { type: 'html',  id: 'classInput',
-                html: '<div style="padding: 3px 10px;">'+
-                    //' Class:'+
-                    '    <input id= "classInput" style="padding: 3px; border-radius: 2px; border: 1px solid silver" placeholder="Enter class name"/>'+
-                    '</div>'
-            },
-            { type: 'button', id: 'add', caption: 'Add Class', icon: 'w2ui-icon-plus' },
-            { type: 'break',  id: 'break1' },
-            { type: 'button', id: 'delete', caption: 'Delete Class', icon: 'w2ui-icon-cross' }//,
-        ],
-        onClick: function (event) {
-            switch (event.target) {
-                case 'add':
-                    var className = $("#classInput").val();
-                    if(className && className.length > 0)
-                    {
-                        //only add this class if it does not already exist
-                        if(w2ui['classesGrid'].find({ class:  className }) == 0)
-                        {
-                            w2ui['classesGrid'].add({ recid: generateNewId(),  class: className});
-                        }
-                        else
-                        {
-                            w2popup.open({
-                                title: 'Add Class',
-                                body: '<div class="w2ui-centered"> The class ' +
-                                    className + ' already exists. </div>',
-                                width: '250',
-                                height: '120',
-                                modal: false
-                            });
-                        }
-                        classNamesList.push(className);
-                    }
-
-                    $("#classInput").val("");
-                    break;
-                case 'delete':
-                    var selectedClasses = w2ui['classesGrid'].getSelection();
-
-                    for(var c=0;c<selectedClasses.length;c++)
-                    {
-                        w2ui['classesGrid'].remove(selectedClasses[c]) ;
-
-                        //remove the class from the list of assign classes
-                        delete classNamesList[classNamesList.indexOf(selectedClasses[c]).class];
-
-                        var assignSamples = w2ui['sampleAndClassGrid'].find(
-                            { class:  w2ui['sampleAndClassGrid'].get(selectedClasses[c]).class });
-                        for(var a=0;a<assignSamples.length;a++)
-                        {
-                            w2ui['sampleAndClassGrid'].set(assignSamples[a], {class: ''});
+    if( w2ui['classToolbar'] == undefined) {
+        $('#classToolbar').w2toolbar({
+            name: 'classToolbar',
+            items: [
+                { type: 'html', id: 'classInput',
+                    html: '<div style="padding: 3px 10px;">' +
+                        '    <input id= "classInput" style="padding: 3px; border-radius: 2px; border: 1px solid silver" placeholder="Enter class name"/>' +
+                        '</div>'
+                },
+                { type: 'button', id: 'add', caption: 'Add Class', icon: 'w2ui-icon-plus' },
+                { type: 'break', id: 'break1' },
+                { type: 'button', id: 'delete', caption: 'Delete Class', icon: 'w2ui-icon-cross' }//,
+            ],
+            onClick: function (event) {
+                switch (event.target) {
+                    case 'add':
+                        var className = $("#classInput").val();
+                        if (className && className.length > 0) {
+                            //only add this class if it does not already exist
+                            if (w2ui['classesGrid'].find({ class: className }) == 0) {
+                                w2ui['classesGrid'].add({ recid: generateNewId(), class: className});
+                            }
+                            else {
+                                w2popup.open({
+                                    title: 'Add Class',
+                                    body: '<div class="w2ui-centered"> The class ' +
+                                        className + ' already exists. </div>',
+                                    width: '250',
+                                    height: '120',
+                                    modal: false
+                                });
+                            }
+                            classNamesList.push(className);
                         }
 
-                        var classNameIndex =
-                        classNamesList.slice(classNameIndex, 1);
-                    }
+                        $("#classInput").val("");
+                        break;
+                    case 'delete':
+                        var selectedClasses = w2ui['classesGrid'].getSelection();
 
-                    break;
+                        for (var c = 0; c < selectedClasses.length; c++) {
+                            w2ui['classesGrid'].remove(selectedClasses[c]);
+
+                            //remove the class from the list of assign classes
+                            //delete classNamesList[classNamesList.indexOf(selectedClasses[c]).class];
+                            var classNameIndex = classNamesList.indexOf(selectedClasses[c]).class;
+                            classNamesList.slice(classNameIndex, 1);
+
+                            var assignSamples = w2ui['sampleAndClassGrid'].find(
+                                { class: w2ui['sampleAndClassGrid'].get(selectedClasses[c]).class });
+                            for (var a = 0; a < assignSamples.length; a++) {
+                                w2ui['sampleAndClassGrid'].set(assignSamples[a], {class: ''});
+                            }
+
+                           // var classNameIndex = classNamesList.slice(classNameIndex, 1);
+                        }
+
+                        break;
+                }
             }
-        }
-    });
+        });
+    }
 }
 
 function assignSamplesToClasses()
@@ -268,10 +254,10 @@ function assignSamplesToClasses()
     console.log("sample and class grid");
 
     //delete any existing samples grid
-    if( w2ui['sampleAndClassGrid'] !== undefined || w2ui['sampleAndClassGrid'] !== undefined)
+    if( w2ui['sampleAndClassGrid'] !== undefined)
     {
-        //w2ui['sampleAndClassGrid'].destroy();
-        return;
+        w2ui['sampleAndClassGrid'].destroy();
+        w2ui['sampleGrid'].destroy();
     }
 
     var btn = w2obj.grid.prototype.buttons;
@@ -307,72 +293,36 @@ function assignSamplesToClasses()
             selectColumn: true,
             toolbar: true,
             footer: true,
-            lineNumbers: true
+            lineNumbers: true//,
         },
         multiSearch: false,
         searches: [
-            { field: 'sample', caption: 'Sample Name', type: 'text' }
-            /*{ field: 'class', caption: 'Class', type: 'text' }*/
+            { field: 'sample', caption: 'Sample Name', type: 'text' },
+            { field: 'class', caption: 'Class', type: 'text' }
         ],
         columns: [
-            { field: 'recid', caption: 'Index', size: '1%'},
-            {field: 'sample', caption: 'Sample Name', size: '45%' },
+            { field: 'recid', caption: 'Index'},//, size: '1%'},
+            {field: 'sample', caption: 'Sample Name'}, //, size: '45%' },
             { field: 'class', caption: 'Class', type: 'text' }
         ],
         sortData: [{ field: 'recid', direction: 'ASC' },
-            { field: 'sample', direction: 'ASC' }]
+            { field: 'sample', direction: 'ASC' },
+            { field: 'class', direction: 'ASC' }]
     });
 
     w2ui['sampleAndClassGrid'].hideColumn('recid');
-    w2ui['sampleAndClassGrid'].hideColumn('class');
-
-    $("#assignClassBtn").click(function()
-    {
-        var selectedClass = w2ui['classesGrid'].getSelection();
-
-        //should only be one class selected
-        if(selectedClass.length == 0)
-        {
-            w2popup.open({
-                title: 'Class Assignment',
-                body: '<div class="w2ui-centered">Please select a class!</div>'
-            });
-
-            return;
-        }
-
-        if(selectedClass.length > 1)
-        {
-            w2popup.open({
-                title: 'Class Assignment',
-                body: '<div class="w2ui-centered">Only one class can be selected!</div>'
-            });
-
-            return;
-        }
-
-        for(var r=0;r<selectedClass.length;r++)
-        {
-            var className = w2ui['classesGrid'].get(selectedClass[r]).class;
-
-            //add the class to the list if it is not already there
-            if($.inArray(className, classNamesList) == -1)
-            {
-                classNamesList.push(className);
-            }
-
-            var selectedSamples = w2ui['sampleAndClassGrid'].getSelection();
-
-            for(var s=0;s<selectedSamples.length;s++)
-            {
-                w2ui['sampleAndClassGrid'].set(selectedSamples[s], {class: className});
-            }
-        }
-
-        w2ui['sampleAndClassGrid'].selectNone();
-    });
+    //w2ui['sampleAndClassGrid'].hideColumn('class');
 
     $('#selectedClass').w2field('list', { items: classNamesList });
+    $('#selectedClass').change(function()
+    {
+        //show only samples with this class
+        //w2ui['sampleAndClassGrid'].showSearch('class');
+        w2ui['sampleAndClassGrid'].search("class", $(this).val());
+    });
+
+    //select the first class in the list
+    $("#selectedClass").val(classNamesList[0]);
 }
 
 function classAssignmentsSummary()
@@ -406,8 +356,6 @@ function classAssignmentsSummary()
         {
             w2ui['classAssignmentSummary'].add(r.toString(), [{ id: r.toString() + "-" + a.toString(),
                     text:  samplesList}]);
-
-            //w2ui['classAssignmentSummary'].disable(r.toString() + "-" + a.toString());
         }
     }
 }
@@ -462,6 +410,7 @@ function downloadFile(fileName, contents)
 $(function()
 {
     $("#creator").smartWizard({
+        keyNavigation: false,
         labelFinish: "Save",
         onLeaveStep : function(obj, context)
         {
@@ -470,7 +419,17 @@ $(function()
                 if (selectedSamplesList.length == 0)
                 {
                     $("#creator").smartWizard("showError", 1);
-                    $("#creator").smartWizard('showMessage', 'Error: Please select some samples!');
+                    $("#creator").smartWizard('showMessage', 'Error: No samples selected!');
+                    return false;
+                }
+            }
+
+            if(context.fromStep == 2 && context.toStep == 3)
+            {
+                if(classNamesList.length == 0)
+                {
+                    $("#creator").smartWizard("showError", 2);
+                    $("#creator").smartWizard('showMessage', 'Error: No classes defined!');
                     return false;
                 }
             }
@@ -503,12 +462,18 @@ $(function()
         onFinish: function(obj, context) {
             //save the cls file to the job result
 
-            var saveMethod = $("#saveMethod").val();
+            var saveMethod = $("input[name='saveMethod']").val();
 
-            saveMethod = "gp";
-            if (saveMethod == "gp")
+            if($("#clsFileName").val() == undefined ||
+                $("#clsFileName").val() == "")
             {
+                $("#creator").smartWizard("showError", 5);
+                $("#creator").smartWizard('showMessage', "Error: No file name provided.");
 
+                $('#clsFileName').w2tag("Enter a file name");
+            }
+            else if (saveMethod == "gp")
+            {
                 //first check if a directory was selected
                 if(selectedGpDir == null)
                 {
@@ -519,14 +484,6 @@ $(function()
 
                     return false;
                 }
-                else if($("#clsFileName").val() == undefined ||
-                    $("#clsFileName").val() == "")
-                {
-                    $("#creator").smartWizard("showError", 5);
-                    $("#creator").smartWizard('showMessage', "Error: No file name provided.");
-
-                    $('#clsFileName').w2tag("Enter a file name");
-                }
                 else
                 {
                     $("#creator").smartWizard("hideError", 5);
@@ -534,10 +491,6 @@ $(function()
 
                     $('#gpDir').w2tag("");
                 }
-
-                //save the file back to GP
-                //var text = ["A different method"];
-                //var url = "http://127.0.0.1:8080/gp/users/nazaire@broadinstitute.org/cls/diffent_thurs.cls";
 
                 var text = [];
                 text.push(createCls());
@@ -555,9 +508,8 @@ $(function()
                         $("#creator").smartWizard('showMessage', "File " + $("#clsFileName").val() + " saved.");
                     }
                 });
-
             }
-            else
+            else if(saveMethod == "download")
             {
                 var clsFileName = $("#clsFileName").val();
 
@@ -569,16 +521,21 @@ $(function()
 
                 $("#creator").smartWizard('showMessage', 'File saved to job ' + jobResultNumber);
             }
+            else
+            {
+                $("#creator").smartWizard('showMessage', "Error: No save method selected.");
+                return false;
+            }
             return true;
 
         },
         onShowStep : function(obj, context)
         {
-            if(context.toStep == 2)
+            if(context.fromStep == 1 && context.toStep == 2)
             {
                 defineClasses();
             }
-            else if(context.toStep == 3)
+            else if(context.fromStep == 2  && context.toStep == 3)
             {
                 assignSamplesToClasses();
             }
@@ -591,6 +548,57 @@ $(function()
 
     //var saveMethods = ['Save CLS file to GenePattern Files Tab','Download CLS file'];
     //$('#saveMethod').w2field('list', { items: saveMethods });
+
+    $("#assignClassBtn").click(function()
+    {
+        var className = $("#selectedClass").val();
+
+        //add the class to the list if it is not already there
+        /*if($.inArray(className, assignedClassNamesList) == -1)
+        {
+            assignedClassNamesList.push(className);
+        }*/
+
+        var selectedSamples = w2ui['sampleGrid'].getSelection();
+
+        for(var s=0;s<selectedSamples.length;s++)
+        {
+            var node =  w2ui['sampleGrid'].get(selectedSamples[s]);
+
+            w2ui['sampleAndClassGrid'].add(
+                {
+                    recid: node.recid,
+                    sample: node.sample,
+                    class: className
+                });
+
+            //hide it from the samples grid
+            w2ui['sampleGrid'].remove(w2ui['sampleGrid'].get(selectedSamples[s]).recid);
+        }
+
+        w2ui['sampleGrid'].selectNone();
+    });
+
+    $("#unassignClassBtn").click(function()
+    {
+        var selectedSamples = w2ui['sampleAndClassGrid'].getSelection();
+
+        for(var s=0;s<selectedSamples.length;s++)
+        {
+            var node =  w2ui['sampleAndClassGrid'].get(selectedSamples[s]);
+            var recordId = node.recid;
+            w2ui['sampleGrid'].add(
+                {
+                    recid: recordId,
+                    sample: node.sample
+                });
+
+            //remove it from the samples grid
+            w2ui['sampleAndClassGrid'].remove(recordId);
+        }
+
+        w2ui['sampleAndClassGrid'].selectNone();
+    });
 
     $("#selectGpDir").hide();
     $("input[name='saveMethod']").click(function()

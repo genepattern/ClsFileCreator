@@ -1,57 +1,3 @@
-function createUploadPath(url, fileContents, totalChunks, fileSize, successFunction)
-{
-    $.ajax({
-        type: "POST",
-        url: "/gp/rest/v1/upload/multipart/?path=" + encodeURIComponent(url) + "&parts=" + totalChunks + "&fileSize=" + fileSize,
-        success: function(data) {
-            console.log("Create Upload path was successful");
-            var token = data['token'];
-
-            uploadDataToFile(url, fileContents, token, totalChunks, 0, successFunction)
-        },
-        error: function(data) {
-            console.log("Create Upload path failed");
-        }
-    });
-}
-
-function assembleFile(url, token, totalChunks, successFunction)
-{
-    $.ajax({
-        type: "POST",
-        url: "/gp/rest/v1/upload/multipart/assemble/?path=" + encodeURIComponent(url) + "&token=" + token + "&parts=" + totalChunks,
-        success: function(data) {
-            //token = data['token'];
-            console.log("Finished uploading the file: " + url);
-            successFunction(data);
-        },
-        error: function(data) {
-            console.log("An error occurred while assembling file : " + url);
-        }
-    });
-}
-
-function uploadDataToFile(url, data, token, totalChunks, nextChunk, successFunction)
-{
-    var uploadData = new Uint8Array(data);
-
-    $.ajax({
-        type: "PUT",
-        dataType: "arraybuffer",
-        processData: false,
-        contentType: false,
-        data: uploadData,
-        url: "/gp/rest/v1/upload/multipart/?path=" + encodeURIComponent(url) + "&token=" + encodeURIComponent(token) + "&index=" + nextChunk + "&parts=" + totalChunks,
-        success: function() {
-            console.log("upload complete");
-            assembleFile(url, token, totalChunks, successFunction);
-        },
-        error: function(data, textStatus) {
-            console.log("Error: " + textStatus);
-        }
-    });
-}
-
 function uploadData(url, data,  callBack)
 {
     var uploadData = new Blob(data, {type: 'text/plain'});
@@ -61,7 +7,7 @@ function uploadData(url, data,  callBack)
         processData: false,
         contentType: false,
         data: uploadData,
-        url: "/gp/rest/v1/upload/single/?path=" + encodeURIComponent(url),
+        url: "/gp/rest/v1/upload/whole/?path=" + encodeURIComponent(url),
         success: function() {
             console.log("upload complete");
             callBack("success");
@@ -113,35 +59,6 @@ function addSubDirs(url)
 
 function saveToGPDialog(callBack)
 {
-    //var dir = "uploads";
-    //var url = encodeURIComponent("http://127.0.0.1:8080/gp/users/nazaire%40broadinstitute.org/");
-
-    //var servletUrl = "/gp/UploadFileTree/tree?relativeDir=."//+url;
-
-    /*var servletUrl = "/gp/UploadFileTree/saveTree";//+url;
-
-    //First get topLevelDirectory
-    $.ajax({
-        url: servletUrl,
-        type: "GET",
-        dataType: "json",
-        success: function(data) {
-            // Populate the parameter with the child files
-            console.log(data);
-
-            $.each(data, function(index, file) {
-                var isFile = !file.data.attr["data-directory"];
-                if (!isFile) {
-                    console.log("directory: " + file);
-                }
-            });
-        },
-        error: function() {
-            console.log("Unable to expand directory.");
-        }
-    });*/
-
-   
     //create dialog
     w2popup.open({
         title   : 'Select Directory from Files Tab',
@@ -153,8 +70,6 @@ function saveToGPDialog(callBack)
         buttons  : '<button class="btn" onclick="w2popup.close();">Cancel</button> <button class="btn" onclick="w2popup.close();">OK</button>',
         onOpen  : function (event) {
             event.onComplete = function () {
-                //var fileTree = $("<div style='height: 300px;'/>");
-                //$("#gpDialog").append(fileTree);
                 $("#fileTree").gpUploadsTree(
                 {
                     name: "Uploads_Tab_Tree"

@@ -37,18 +37,16 @@
     height: 262px;
     width: 300px;
     float: left;
-    margin-top: 6px;
+    margin-top: 5px;
+    margin-left: 140px;
 }
 
 #sampleAndClassGrid
 {
-    height: 262px;
+    height: 238px;
     width: 320px;
     float: left;
-    margin-top: 6px;
-    margin-left: 4px;
 }
-
 
 #classEntry
 {
@@ -68,31 +66,35 @@
     width: 240px;
 }
 
-#classesTableDiv
-{
-    /*float: right;*/
-}
-
 #classesGrid
 {
     height: 225px;
-    width:  600px; /*335px;*/ /* 395px; */
-    /*float: left;*/
-    /*margin-top: 6px;*/
+    width:  600px;
     margin-right: 15px;
+}
+
+#selectedClass
+{
+    height: 28px;
+    width: 320px;
+}
+
+#classSelector
+{
+    margin: 0;
 }
 
 #classToolbar
 {
     margin-top: 6px;
-    width: 600px; /*395px;*/
+    width: 600px;
 }
 
 #assignClassDiv
 {
     width: 65px;
     float: left;
-    margin-top: 110px;
+    margin-top: 100px;
 }
 
 #classAssignmentSummary
@@ -122,7 +124,6 @@
     margin-right: auto;
     font-size: 12px;
     font-weight: normal;
-    /*padding: 8px;*/
 }
 
 #saveCLS input[type=text]
@@ -141,14 +142,6 @@
     margin-top: 5px;
     padding: 2px;
 }
-
-/*
-#saveCLS input
-{
-    margin-top: 50px;
-    margin-left: 4px;
-    width: 200px;
-}*/
 
 .header
 {
@@ -210,15 +203,8 @@ button.btn
     cursor: pointer;
 }
 
-#creator{
-    border: 2px solid blue;
-}
 
 
-.w2ui-tag .w2ui-tag-body
-{
-    background-color: red;
-}
 
 
 
