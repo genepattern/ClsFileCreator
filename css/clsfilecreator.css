@@ -1,6 +1,8 @@
 #sampleTable
 {
     font-size: 12px;
+    margin: 0 auto;
+    width: 90%;
 }
 
 #sampleTable tr td
@@ -26,26 +28,30 @@
 
 #sampleControls
 {
-    margin: 0 auto;
-    width: 1170px;
+    width: 200px; /*1130px;*/
     font-size: 14px;
-    padding: 4px;
+    padding-top: 4px;
+    /*padding: 4px 0 4px 500px;*/
+    margin-left: 900px;
 }
+
 
 #sampleGrid
 {
-    height: 262px;
+    height: 268px;
     width: 300px;
     float: left;
-    margin-top: 5px;
+    margin-top: 3px;
     margin-left: 140px;
 }
 
 #sampleAndClassGrid
 {
-    height: 238px;
+    height: 239px;
     width: 320px;
     float: left;
+    margin-left: 17px;
+    margin-top: 0;
 }
 
 #classEntry
@@ -57,7 +63,16 @@
 
 #assignClassBtn
 {
-    margin-left: 10px;
+    margin-left: 12px;
+    margin-right: 12px;
+    float: left;
+}
+
+#unassignClassBtn
+{
+    margin-left: 12px;
+    margin-right: 12px;
+    margin-top: 9px;
     float: left;
 }
 
@@ -76,12 +91,18 @@
 #selectedClass
 {
     height: 28px;
-    width: 320px;
+    width: 278px; /*305px;*/
+    /*margin-left: 17px;*/
+}
+
+#classSelector label
+{
+    margin-left: 17px;
 }
 
 #classSelector
 {
-    margin: 0;
+    margin: 0 0 0 27px;
 }
 
 #classToolbar
@@ -95,6 +116,8 @@
     width: 65px;
     float: left;
     margin-top: 100px;
+    margin-left: 3px;
+    margin-right: 3px;
 }
 
 #classAssignmentSummary
@@ -201,6 +224,71 @@
 button.btn
 {
     cursor: pointer;
+}
+
+.w2ui-tb-caption
+{
+    cursor: pointer;
+}
+
+#tb_classToolbar_item_add, #tb_classToolbar_item_delete
+{
+    display: inline-block;
+    border-radius: 4px;
+    margin: 0px 5px;
+    padding: 7px 12px 6px 12px !important;
+    color: #666;
+    font-size: 12px !important;
+    border: 1px solid #B6B6B6;
+    background-image: -webkit-linear-gradient(#ffffff 0%, #e7e7e7 100%);
+    background-image: -moz-linear-gradient(#ffffff 0%, #e7e7e7 100%);
+    background-image: -ms-linear-gradient(#ffffff 0%, #e7e7e7 100%);
+    background-image: -o-linear-gradient(#ffffff 0%, #e7e7e7 100%);
+    background-image: linear-gradient(#ffffff 0%, #e7e7e7 100%);
+    filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ffe7e7e7', endColorstr='#ffffffff', GradientType=0);
+    outline: none;
+    box-shadow: 0px 1px 0px white;
+    cursor: default;
+    min-width: 75px;
+    line-height: 100% !important;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+#tb_classToolbar_item_add:hover, #tb_classToolbar_item_delete:hover
+{
+    text-decoration: none;
+    border: 1px solid #bbb;
+    background-image: -webkit-linear-gradient(#f7f7f7 0%, #dddddd 100%);
+    background-image: -moz-linear-gradient(#f7f7f7 0%, #dddddd 100%);
+    background-image: -ms-linear-gradient(#f7f7f7 0%, #dddddd 100%);
+    background-image: -o-linear-gradient(#f7f7f7 0%, #dddddd 100%);
+    background-image: linear-gradient(#f7f7f7 0%, #dddddd 100%);
+    filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ffdddddd', endColorstr='#fff7f7f7', GradientType=0);
+    color: #333;
+}
+
+#tb_classToolbar_item_add:active,
+#tb_classToolbar_item_delete:active {
+    border: 1px solid #999;
+    background-image: -webkit-linear-gradient(#cccccc 0%, #cccccc 100%);
+    background-image: -moz-linear-gradient(#cccccc 0%, #cccccc 100%);
+    background-image: -ms-linear-gradient(#cccccc 0%, #cccccc 100%);
+    background-image: -o-linear-gradient(#cccccc 0%, #cccccc 100%);
+    background-image: linear-gradient(#cccccc 0%, #cccccc 100%);
+    filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ffcccccc', endColorstr='#ffcccccc', GradientType=0);
+    text-shadow: 1px 1px 1px #eee;
+}
+#tb_classToolbar_item_add:disabled,
+#tb_classToolbar_item_delete:disabled {
+    border: 1px solid #bbb !important;
+    background: #f7f7f7 !important;
+    color: #bdbcbc !important;
+    text-shadow: none !important;
 }
 
 

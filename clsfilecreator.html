@@ -73,11 +73,6 @@
         <h2 class="StepTitle">Define the classes</h2>
 
         <div id="classesMainDiv">
-            <!--<div id="classEntry">
-                <label for="className">Class:</label>
-                <input type="text" placeholder="Enter class name" id="className"/>
-                <button id="addClass"> Add </button>
-            </div>-->
             <div id="classesTableDiv">
                 <div id="classToolbar" style="padding: 4px; border: 1px solid silver; border-radius: 3px"></div>
                 <div id="classesGrid"></div>
@@ -92,12 +87,13 @@
         <div id="sampleGrid"></div>
 
         <div id="assignClassDiv" class="w2ui-button">
-                <img src="images/black_left_arrow.png" id="unassignClassBtn" height="32" width="52"/>
-                <img src="images/black_right_arrow.png" id="assignClassBtn" height="32" width="52"/>
+            <input type="image" src="images/black_right_arrow.png" id="assignClassBtn" height="32" width="52"/>
+            <br/>
+            <input type="image" src="images/black_left_arrow.png" id="unassignClassBtn" height="32" width="52"/>
         </div>
         <div class="w2ui-field w2ui-span3">
             <div id="classSelector">
-                <input type="list" id="selectedClass">
+                <label>Class: <input type="list" id="selectedClass"/></label>
             </div>
         </div>
         <div id="sampleAndClassGrid"></div>
