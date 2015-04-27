@@ -31,12 +31,21 @@ function generateNewId()
     return ++idIncrement;
 }
 
+function displayLoadError(errorMsg)
+{
+    $("#creator").empty();
+    $("#creator").append("<h3>There was an error loading the ClsFileCreator. Error: " + errorMsg +"</h3>");
+}
+
 function parseGCTFile(fileURL) {
     $.ajax({
         contentType: 'text/plain',
         url: fileURL
-    }).done(function (text, status, xhr) {
-        loadSamples(text);
+    }).done(function (response, status, xhr) {
+        loadSamples(response);
+    }).fail(function (response, status, xhr)
+    {
+        displayLoadError(response.statusText);
     });
 }
 
@@ -424,7 +433,7 @@ function downloadFile(fileName, contents)
     saveAs(blob, fileName);
 }
 
-$(function()
+function init()
 {
     $("#creator").smartWizard({
         keyNavigation: false,
@@ -635,6 +644,9 @@ $(function()
             }
         });
     });
+}
+$(function()
+{
 
     var requestParams = parseQueryString();
 
@@ -645,14 +657,16 @@ $(function()
     {
         alert("No input files found");
         console.log("No input files found");
+
+        displayLoadError("No input files found");
     }
     else
     {
+        init();
         for (var t = 0; t < inputFiles.length; t++)
         {
             console.log("input file: " + inputFiles[t]);
             parseGCTFile(inputFiles[t]);
         }
     }
-
 });
