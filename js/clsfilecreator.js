@@ -16,14 +16,17 @@ gp.Util.endsWith = function(string, suffix) {
         && string.substr(string.length - suffix.length) === suffix;
 };
 
-function parseQueryString() {
-    console.log("clsfilecreator url: " + window.location);
-    var query = (window.location.search || '?').substr(1),
-        map   = {};
-    query.replace(/([^&=]+)=?([^&]*)(?:&+|$)/g, function(match, key, value) {
-        (map[key] = map[key] || []).push(value);
-    });
-    return map;
+var parseQueryString = function( ) {
+    var queryStringParams=[];
+    if (window.location.search) {
+        queryString=window.location.search;
+        if (queryString) {
+            //drop the leading '?'
+            queryString=queryString.substring(1);
+            queryStringParams=_parseQueryString( queryString );
+        }
+    }
+    return queryStringParams;
 }
 
 function generateNewId()
@@ -541,7 +544,7 @@ function init()
 
                 downloadFile(clsFileName, clsText);
 
-                $("#creator").smartWizard('showMessage', 'File downloaded.');
+                $("#creator").smartWizard('showMessage', 'File ' + clsFileName + ' downloaded.');
             }
             else
             {
