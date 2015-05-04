@@ -16,14 +16,17 @@ gp.Util.endsWith = function(string, suffix) {
         && string.substr(string.length - suffix.length) === suffix;
 };
 
-function parseQueryString() {
-    console.log("clsfilecreator url: " + window.location);
-    var query = (window.location.search || '?').substr(1),
-        map   = {};
-    query.replace(/([^&=]+)=?([^&]*)(?:&+|$)/g, function(match, key, value) {
-        (map[key] = map[key] || []).push(value);
-    });
-    return map;
+var parseQueryString = function( ) {
+    var queryStringParams=[];
+    if (window.location.search) {
+        queryString=window.location.search;
+        if (queryString) {
+            //drop the leading '?'
+            queryString=queryString.substring(1);
+            queryStringParams=_parseQueryString( queryString );
+        }
+    }
+    return queryStringParams;
 }
 
 function generateNewId()
@@ -31,12 +34,21 @@ function generateNewId()
     return ++idIncrement;
 }
 
+function displayLoadError(errorMsg)
+{
+    $("#creator").empty();
+    $("#creator").append("<h3>There was an error loading the ClsFileCreator. Error: " + errorMsg +"</h3>");
+}
+
 function parseGCTFile(fileURL) {
     $.ajax({
         contentType: 'text/plain',
         url: fileURL
-    }).done(function (text, status, xhr) {
-        loadSamples(text);
+    }).done(function (response, status, xhr) {
+        loadSamples(response);
+    }).fail(function (response, status, xhr)
+    {
+        displayLoadError(response.statusText);
     });
 }
 
@@ -424,7 +436,7 @@ function downloadFile(fileName, contents)
     saveAs(blob, fileName);
 }
 
-$(function()
+function init()
 {
     $("#creator").smartWizard({
         keyNavigation: false,
@@ -532,7 +544,7 @@ $(function()
 
                 downloadFile(clsFileName, clsText);
 
-                $("#creator").smartWizard('showMessage', 'File downloaded.');
+                $("#creator").smartWizard('showMessage', 'File ' + clsFileName + ' downloaded.');
             }
             else
             {
@@ -635,6 +647,9 @@ $(function()
             }
         });
     });
+}
+$(function()
+{
 
     var requestParams = parseQueryString();
 
@@ -645,14 +660,16 @@ $(function()
     {
         alert("No input files found");
         console.log("No input files found");
+
+        displayLoadError("No input files found");
     }
     else
     {
+        init();
         for (var t = 0; t < inputFiles.length; t++)
         {
             console.log("input file: " + inputFiles[t]);
             parseGCTFile(inputFiles[t]);
         }
     }
-
 });
