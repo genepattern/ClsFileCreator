@@ -16,19 +16,6 @@ gp.Util.endsWith = function(string, suffix) {
         && string.substr(string.length - suffix.length) === suffix;
 };
 
-var parseQueryString = function( ) {
-    var queryStringParams=[];
-    if (window.location.search) {
-        queryString=window.location.search;
-        if (queryString) {
-            //drop the leading '?'
-            queryString=queryString.substring(1);
-            queryStringParams=_parseQueryString( queryString );
-        }
-    }
-    return queryStringParams;
-}
-
 function generateNewId()
 {
     return ++idIncrement;
@@ -651,7 +638,7 @@ function init()
 $(function()
 {
 
-    var requestParams = parseQueryString();
+    var requestParams = gpUtil.parseQueryString();
 
     jobResultNumber = requestParams["job.number"];
 
