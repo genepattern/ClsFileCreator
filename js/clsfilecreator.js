@@ -636,7 +636,7 @@ $(function()
         });
     });
 
-    var requestParams = parseQueryString();
+    var requestParams = gpUtil.parseQueryString();
 
     jobResultNumber = requestParams["job.number"];
 
