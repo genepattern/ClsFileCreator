@@ -310,13 +310,12 @@ function assignSamplesToClasses()
         name   : 'sampleAndClassGrid',
         show: {
             selectColumn: true,
-            toolbar: true,
+            toolbar: false,
             footer: true,
             lineNumbers: true//,
         },
         multiSearch: false,
         searches: [
-            { field: 'sample', caption: 'Sample Name', type: 'text' },
             { field: 'class', caption: 'Class', type: 'text' }
         ],
         columns: [
