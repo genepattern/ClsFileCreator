@@ -24,8 +24,10 @@ pipelineModel=
 privacy=public
 publicationDate=04/08/2015 13\:04 
 quality=production
+requiredPatchLSIDs=urn\:lsid\:broadinstitute.org\:plugin\:GenePattern_3_9_3\:1,
+requiredPatchURLs=http\://www.broadinstitute.org/webservices/gpModuleRepository/download/prod/patch/?file\=/GenePattern_3_9_3/broadinstitute.org\:plugin/GenePattern_3_9_3/1/GenePattern_3_9_3.zip
 serializedModel=
 taskDoc=doc.html
 taskType=javascript
 userid=GenePattern (gp-help@broadinstitute.org)
-version=Changed text for downloading the CLS file
+version=Added plugin to check that the GenePattern server is version 3.9.3 or greater
