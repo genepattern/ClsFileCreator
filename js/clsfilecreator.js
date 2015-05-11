@@ -40,7 +40,8 @@ function displayLoadError(errorMsg)
     $("#creator").append("<h3>There was an error loading the ClsFileCreator. Error: " + errorMsg +"</h3>");
 }
 
-function parseGCTFile(fileURL) {
+function parseGCTFile(fileURL)
+{
     $.ajax({
         contentType: 'text/plain',
         url: fileURL
@@ -135,7 +136,6 @@ function listSamples(sampleNames)
                 tableRow.append(tableData);
             }
         }
-
     }
 
     var div = $("<div/>");
@@ -543,7 +543,7 @@ function init()
 
                 downloadFile(clsFileName, clsText);
 
-                $("#creator").smartWizard('showMessage', 'File ' + clsFileName + ' downloaded.');
+                $("#creator").smartWizard('showMessage', 'File ' + clsFileName + ' created.');
             }
             else
             {

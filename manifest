@@ -28,4 +28,4 @@ serializedModel=
 taskDoc=doc.html
 taskType=javascript
 userid=GenePattern (gp-help@broadinstitute.org)
-version=Modified to be a javascript visualizer
+version=Changed text for downloading the CLS file
