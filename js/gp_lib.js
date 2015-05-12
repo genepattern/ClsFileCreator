@@ -1,4 +1,4 @@
-function uploadData(url, data,  callBack)
+function uploadDataToFilesTab(url, data,  callBack)
 {
     var uploadData = new Blob(data, {type: 'text/plain'});
 
@@ -10,26 +10,17 @@ function uploadData(url, data,  callBack)
         url: "/gp/rest/v1/upload/whole/?path=" + encodeURIComponent(url),
         success: function() {
             console.log("upload complete");
-            callBack("success");
+
+            if(callBack !== undefined)
+            {
+                callBack("success");
+            }
         },
         error: function(data, textStatus) {
             console.log("Error: " + textStatus);
             callBack("Error: " + textStatus)
         }
     });
-}
-
-function uploadToFilesTab(url, data, successFunction)
-{
-    var uploadData = new Uint8Array(data);
-
-    //data can be chunked but not doing this
-    //only one chunk will be sent
-    /*var totalChunks = 1;
-    var nextChunk =0;
-    var dataSize = uploadData.byteLength;
-    createUploadPath(url, data, totalChunks, dataSize, successFunction);
-    */
 }
 
 function addSubDirs(url)

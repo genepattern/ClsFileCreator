@@ -525,7 +525,7 @@ function init()
 
                 var saveLocation = selectedGpDir + clsFileName;
                 console.log("save location: " + saveLocation);
-                uploadData(saveLocation, text, function(result)
+                uploadDataToFilesTab(saveLocation, text, function(result)
                 {
                     if(result !== "success")
                     {
