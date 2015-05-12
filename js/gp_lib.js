@@ -23,31 +23,6 @@ function uploadDataToFilesTab(url, data,  callBack)
     });
 }
 
-function addSubDirs(url)
-{
-    var servletUrl = "/gp/UploadFileTree/saveTree?dir="+url;
-
-    $.ajax({
-        url: servletUrl,
-        type: "GET",
-        dataType: "json",
-        success: function(data) {
-            // Populate the parameter with the child files
-            console.log(data);
-
-            $.each(data, function(index, file) {
-                var isFile = !file.data.attr["data-directory"];
-                if (!isFile) {
-                    console.log("directory: " + file);
-                }
-            });
-        },
-        error: function() {
-            console.log("Unable to expand directory.");
-        }
-    });
-}
-
 function saveToGPDialog(callBack)
 {
     //create dialog
