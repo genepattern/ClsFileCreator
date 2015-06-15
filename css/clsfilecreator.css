@@ -299,6 +299,11 @@ button.btn
     text-shadow: none !important;
 }
 
+#fileLoaded
+{
+    font-size: 13px;
+}
+
 
 
 

@@ -4,7 +4,8 @@ var idIncrement = 0;
 var jobResultNumber = -1;
 var classNamesList = [];
 var selectedGpDir = null;
-var gctFile;
+var gctFile; //URL to the gct file
+var gctFileName; //name of the gct file
 
 function generateNewId()
 {
@@ -424,6 +425,8 @@ function init()
         {
             if(context.fromStep == 1 && context.toStep == 2)
             {
+                //$("#step-2").find(".StepTitle").after("<span>Loaded: " + gctFileName + "</span>");
+
                 if (selectedSamplesList.length == 0)
                 {
                     $("#creator").smartWizard("showError", 1);
@@ -437,6 +440,8 @@ function init()
 
             if(context.fromStep == 2 && context.toStep == 3)
             {
+                //$("#step-3").find(".StepTitle").after("<span>Loaded: " + gctFileName + "</span>");
+
                 if(classNamesList.length == 0)
                 {
                     $("#creator").smartWizard("showError", 2);
@@ -447,6 +452,8 @@ function init()
 
             if(context.fromStep == 3 && context.toStep == 4)
             {
+                //$("#step-4").find(".StepTitle").after("<span>Loaded: " + gctFileName + "</span>");
+
                 if(w2ui['sampleGrid'].records.length !==0)
                 {
                     var numMissing = w2ui['sampleGrid'].records.length;
@@ -570,7 +577,7 @@ function init()
             w2ui['sampleGrid'].remove(w2ui['sampleGrid'].get(selectedSamples[s]).recid);
         }
 
-        w2ui['sampleGrid'].reset(); //selectNone();
+        w2ui['sampleGrid'].reset();
     });
 
     $("#unassignClassBtn").click(function()
@@ -653,16 +660,17 @@ $(function()
             var parser = $('<a/>');
             parser.attr("href", gctFile);
 
-            var gctFileName = parser[0].pathname.substring(parser[0].pathname.lastIndexOf('/')+1);
+            gctFileName = parser[0].pathname.substring(parser[0].pathname.lastIndexOf('/')+1);
             //set the basename of the output cls file
 
             var extension = gctFileName.substring(gctFileName.length-4);
             if(extension.toLowerCase() === ".gct")
             {
-                gctFileName = gctFileName.replace(extension, ".cls");
+                $("#clsFileName").val(gctFileName.replace(extension, ".cls"));
             }
 
-            $("#clsFileName").val(gctFileName);
+            $("#fileLoaded").append("<span>Loaded: " + gctFileName + "</span>");
+
             parseGCTFile(inputFiles[t]);
         }
     }
