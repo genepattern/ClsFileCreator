@@ -30,4 +30,4 @@ serializedModel=
 taskDoc=doc.html
 taskType=javascript
 userid=GenePattern (gp-help@broadinstitute.org)
-version=Added plugin to check that the GenePattern server is version 3.9.3 or greater
+version=Fixed bug with missing samples and creation of the cls file, added display of the name of the loaded gct file, and addedba default name for the output cls file
