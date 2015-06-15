@@ -570,7 +570,7 @@ function init()
             w2ui['sampleGrid'].remove(w2ui['sampleGrid'].get(selectedSamples[s]).recid);
         }
 
-        w2ui['sampleGrid'].selectNone();
+        w2ui['sampleGrid'].reset(); //selectNone();
     });
 
     $("#unassignClassBtn").click(function()
