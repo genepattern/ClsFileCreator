@@ -16,13 +16,21 @@
 
 .swMain .stepContainer div.content
 {
-    overflow:auto;
     width: 100%;
+    background-color: transparent;
+    border: none;
 }
 
 .swMain .stepContainer
 {
-    overflow-y: hidden;
+    background-color:#F8F8F8;
+    border: 1px solid #CCC;
+    -webkit-border-radius: 5px;
+    -moz-border-radius  : 5px;
+}
+
+.swMain .stepContainer
+{
     width: 100%;
 }
 
@@ -192,7 +200,7 @@
 }
 
 .swMain {
-    width: 1155px;
+    width: 1150px;
     padding: 0;
     margin: 0;
 }

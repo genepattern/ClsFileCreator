@@ -4,30 +4,7 @@ var idIncrement = 0;
 var jobResultNumber = -1;
 var classNamesList = [];
 var selectedGpDir = null;
-
-
-if (typeof gp === 'undefined') {
-    gp = {};
-}
-gp.Util = function() {};
-
-gp.Util.endsWith = function(string, suffix) {
-    return string.length >= suffix.length
-        && string.substr(string.length - suffix.length) === suffix;
-};
-
-var parseQueryString = function( ) {
-    var queryStringParams=[];
-    if (window.location.search) {
-        queryString=window.location.search;
-        if (queryString) {
-            //drop the leading '?'
-            queryString=queryString.substring(1);
-            queryStringParams=_parseQueryString( queryString );
-        }
-    }
-    return queryStringParams;
-}
+var gctFile;
 
 function generateNewId()
 {
@@ -81,12 +58,12 @@ function listSamples(sampleNames)
     var controls = $("<div/>").attr("id", "sampleControls");
     controls.append($("<button class='btn'>Check All</button>").attr("id", "checkAllSamples").click(function()
     {
-        $("#sampleTable").find("input:checkbox").prop('checked', true); //.click();
+        $("#sampleTable").find("input:checkbox").prop('checked', true);
     }));
 
     controls.append($("<button class='btn'>Uncheck All</button>").attr("id", "uncheckAllSamples").click(function()
     {
-        $("#sampleTable").find("input:checkbox").prop('checked', false); //.click();
+        $("#sampleTable").find("input:checkbox").prop('checked', false);
     }));
 
     $("#step-1").append(controls);
@@ -94,7 +71,10 @@ function listSamples(sampleNames)
     var table = $("<table/>").attr("id", "sampleTable");
     var tableRow = null;
 
-    var numRows = (sampleNames.length / 4 >> 0); //num columns is  4
+    var surplusRow = sampleNames.length % 4;
+    surplusRow = surplusRow > 0 ? 1: 0;
+
+    var numRows = (sampleNames.length / 4 >> 0) + surplusRow; //num columns is  4
     for(var r=0;r<numRows;r++)
     {
         tableRow = $("<tr/>");
@@ -146,12 +126,6 @@ function listSamples(sampleNames)
 
 function defineClasses()
 {
-    var sampleRecords =  [];
-    for(var s=0;s<selectedSamplesList.length;s++)
-    {
-        sampleRecords.push({ recid: s, sample: selectedSamplesList[s]});
-    }
-
     if( w2ui['classesGrid'] !== undefined)
     {
         w2ui['classesGrid'].destroy();
@@ -175,8 +149,7 @@ function defineClasses()
             { field: 'recid', caption: 'Index'},
             {field: 'class', caption: 'Class', size: '100%', editable: false }
         ],
-        sortData: [{ field: 'recid', direction: 'ASC' },
-            { field: 'class', direction: 'ASC' }]
+        sortData: [{ field: 'recid', direction: 'ASC' }]
     });
 
     if( w2ui['classToolbar'] == undefined) {
@@ -200,6 +173,7 @@ function defineClasses()
                             //only add this class if it does not already exist
                             if (w2ui['classesGrid'].find({ class: className }) == 0) {
                                 w2ui['classesGrid'].add({ recid: generateNewId(), class: className});
+                                w2ui['classesGrid'].sort('class', 'asc');
                             }
                             else {
                                 w2popup.open({
@@ -212,7 +186,7 @@ function defineClasses()
                                     modal: false
                                 });
                             }
-                            classNamesList.unshift(className);
+                            classNamesList.push(className);
 
                             $("#tb_classToolbar_item_delete").removeAttr("disabled");
                         }
@@ -267,9 +241,15 @@ function defineClasses()
 function assignSamplesToClasses()
 {
     var sampleRecords =  [];
-    for(var s=0;s<selectedSamplesList.length;s++)
+    for(var s=0;s<sampleNamesList.length;s++)
     {
-        sampleRecords.push({ recid: s, sample: selectedSamplesList[s]});
+        //find index of sample
+        var sampleIndex = $.inArray( sampleNamesList[s], selectedSamplesList);
+
+        if(sampleIndex !== -1)
+        {
+            sampleRecords.push({ recid: s, sample: sampleNamesList[s]});
+        }
     }
 
     //delete any existing samples grid
@@ -323,9 +303,8 @@ function assignSamplesToClasses()
             {field: 'sample', caption: 'Sample Name', size: '100%' },
             { field: 'class', caption: 'Class', type: 'text' }
         ],
-        sortData: [{ field: 'recid', direction: 'ASC' },
-            { field: 'sample', direction: 'ASC' },
-            { field: 'class', direction: 'ASC' }]
+        sortData: [{ field: 'recid', direction: 'ASC' }
+        ]
     });
 
     w2ui['sampleAndClassGrid'].hideColumn('recid');
@@ -357,7 +336,7 @@ function classAssignmentsSummary()
     });
 
     var classRecords =  w2ui['classesGrid'].records;
-    for(var r=0;r<classRecords.length;r++)
+    for(var r=0;r< classRecords.length;r++)
     {
         var className = classRecords[r].class;
 
@@ -400,7 +379,7 @@ function createCls()
     text += "\n";
 
     var sampleRecords = w2ui['sampleAndClassGrid'].records;
-    for(var s=0;s<sampleRecords.length;s++)
+    for(var s=sampleNamesList.length-1;s>=0;s--)
     {
         var className = sampleRecords[s].class;
         var index = classNamesList.indexOf(className);
@@ -417,10 +396,11 @@ function createCls()
             });
         }
 
-        if(s !== 0)
+        if(s !== sampleNamesList.length-1)
         {
             text += " ";
         }
+
         text += index;
     }
     return text;
@@ -494,7 +474,7 @@ function init()
                 return;
             }
 
-            if (!gp.Util.endsWith(clsFileName.toLowerCase(), '.cls')) {
+            if (!gpUtil.endsWith(clsFileName.toLowerCase(), '.cls')) {
                 clsFileName += '.cls';
             }
 
@@ -525,7 +505,7 @@ function init()
 
                 var saveLocation = selectedGpDir + clsFileName;
                 console.log("save location: " + saveLocation);
-                uploadDataToFilesTab(saveLocation, text, function(result)
+                gpLib.uploadDataToFilesTab(saveLocation, text, function(result)
                 {
                     if(result !== "success")
                     {
@@ -629,7 +609,7 @@ function init()
 
     $("#gpDir").click(function()
     {
-        saveToGPDialog(function(selectedDir)
+        gpLib.saveToGPDialog(function(selectedDir)
         {
             $("#selectedDir").empty();
             selectedGpDir = null;
@@ -649,7 +629,6 @@ function init()
 }
 $(function()
 {
-
     var requestParams = gpUtil.parseQueryString();
 
     jobResultNumber = requestParams["job.number"];
@@ -668,6 +647,22 @@ $(function()
         for (var t = 0; t < inputFiles.length; t++)
         {
             console.log("input file: " + inputFiles[t]);
+            gctFile = inputFiles[t];
+
+            //set the name of the gct file
+            var parser = $('<a/>');
+            parser.attr("href", gctFile);
+
+            var gctFileName = parser[0].pathname.substring(parser[0].pathname.lastIndexOf('/')+1);
+            //set the basename of the output cls file
+
+            var extension = gctFileName.substring(gctFileName.length-4);
+            if(extension.toLowerCase() === ".gct")
+            {
+                gctFileName = gctFileName.replace(extension, ".cls");
+            }
+
+            $("#clsFileName").val(gctFileName);
             parseGCTFile(inputFiles[t]);
         }
     }

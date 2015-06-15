@@ -1,55 +1,71 @@
-function uploadDataToFilesTab(url, data,  callBack)
-{
-    var uploadData = new Blob(data, {type: 'text/plain'});
+var gpLib = function() {
 
-    $.ajax({
-        type: "POST",
-        processData: false,
-        contentType: false,
-        data: uploadData,
-        url: "/gp/rest/v1/upload/whole/?path=" + encodeURIComponent(url),
-        success: function() {
-            console.log("upload complete");
+    /**
+     * Uploads a file to the GP Files Tab
+     * @param url - the url of the file on the GP server
+     * @param data - the contents of the file
+     * @param callBack - a callback function if the upload was successful
+     */
+    function uploadDataToFilesTab(url, data, callBack) {
+        var uploadData = new Blob(data, {type: 'text/plain'});
 
-            if(callBack !== undefined)
-            {
-                callBack("success");
+        $.ajax({
+            type: "POST",
+            processData: false,
+            contentType: false,
+            data: uploadData,
+            url: "/gp/rest/v1/upload/whole/?path=" + encodeURIComponent(url),
+            success: function () {
+                console.log("upload complete");
+
+                if (callBack !== undefined) {
+                    callBack("success");
+                }
+            },
+            error: function (data, textStatus) {
+                console.log("Error: " + textStatus);
+                callBack("Error: " + textStatus)
             }
-        },
-        error: function(data, textStatus) {
-            console.log("Error: " + textStatus);
-            callBack("Error: " + textStatus)
-        }
-    });
-}
+        });
+    }
 
-function saveToGPDialog(callBack)
-{
-    //create dialog
-    w2popup.open({
-        title   : 'Select Directory from Files Tab',
-        width   : 600,
-        height  : 320,
-        showMax : true,
-        modal: true,
-        body    : '<div id="gpDialog"><div id="fileTree" style="height: 300px;"/></div>',
-        buttons  : '<button class="btn" onclick="w2popup.close();">Cancel</button> <button class="btn" onclick="w2popup.close();">OK</button>',
-        onOpen  : function (event) {
-            event.onComplete = function () {
-                $("#fileTree").gpUploadsTree(
-                {
-                    name: "Uploads_Tab_Tree"
-                });
-            };
-        },
-        onClose: function (event) {
-            var selectGpDir = $("#fileTree").gpUploadsTree("selectedDir");
-            event.onComplete = function () {
-                $("#fileTree").gpUploadsTree("destroy");
-                callBack(selectGpDir);
+    /**
+     * This function displays a dialog displaying the directories in the Files Tab for the current GP user
+     * @param callBack - a callback function if a directory in the Files Tab was selected
+     */
+    function saveToGPDialog(callBack) {
+        //create dialog
+        w2popup.open({
+            title: 'Select Directory from Files Tab',
+            width: 600,
+            height: 320,
+            showMax: true,
+            modal: true,
+            body: '<div id="gpDialog"><div id="fileTree" style="height: 300px;"/></div>',
+            buttons: '<button class="btn" onclick="w2popup.close();">Cancel</button> <button class="btn" onclick="w2popup.close();">OK</button>',
+            onOpen: function (event) {
+                event.onComplete = function () {
+                    $("#fileTree").gpUploadsTree(
+                        {
+                            name: "Uploads_Tab_Tree"
+                        });
+                };
+            },
+            onClose: function (event) {
+                var selectGpDir = $("#fileTree").gpUploadsTree("selectedDir");
+                event.onComplete = function () {
+                    $("#fileTree").gpUploadsTree("destroy");
+                    callBack(selectGpDir);
+                }
             }
-        }
-    });
+        });
+    }
+
+    // declare 'public' functions
+    return {
+        saveToGPDialog: saveToGPDialog,
+        uploadDataToFilesTab: uploadDataToFilesTab
+    };
 }
 
 (function( $ ) {
