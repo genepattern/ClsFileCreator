@@ -315,7 +315,6 @@ function assignSamplesToClasses()
     $('#selectedClass').change(function()
     {
         //show only samples with this class
-        //w2ui['sampleAndClassGrid'].hideSearch('class');
         w2ui['sampleAndClassGrid'].search("class", $(this).val());
         w2ui['sampleAndClassGrid'].hideSearch('class');
     });
@@ -578,6 +577,25 @@ function init()
         }
 
         w2ui['sampleGrid'].reset();
+
+        var classNameIndex = $.inArray(className, classNamesList);
+        var list = classNamesList.slice();
+
+        var numExistingSamplesInClass = $('#selectedClass').data(className);
+        if(numExistingSamplesInClass === undefined)
+        {
+            numExistingSamplesInClass = 0;
+        }
+        else
+        {
+            numExistingSamplesInClass = parseInt(numExistingSamplesInClass);
+        }
+        var numSamplesInClass = selectedSamples.length + numExistingSamplesInClass;
+        list[classNameIndex] = className + " (" + numSamplesInClass + ")";
+
+        $('#selectedClass').data(className, numSamplesInClass);
+        $('#selectedClass').w2field('list', { items: list, selected: list[classNameIndex] });
+
     });
 
     $("#unassignClassBtn").click(function()
@@ -623,7 +641,7 @@ function init()
 
             if(selectedDir.url !== undefined)
             {
-                $("#selectedDir").text("Directory:" + selectedDir.url);
+                $("#selectedDir").text("Directory: " + decodeURIComponent(selectedDir.url));
                 selectedGpDir = selectedDir.url;
                 $('#gpDir').w2tag("");
             }
@@ -669,7 +687,7 @@ $(function()
                 $("#clsFileName").val(gctFileName.replace(extension, ".cls"));
             }
 
-            $("#fileLoaded").append("<span>Loaded: " + gctFileName + "</span>");
+            $("#fileLoaded").append("<span>Loaded: <a href='" + gctFile + "'>" + gctFileName +"</a></span>");
 
             parseGCTFile(inputFiles[t]);
         }

@@ -12,6 +12,7 @@
     <script src="js/FileSaver.min.js"></script>
     <script src="js/gp_lib.js"></script>
     <script src="js/gpUtil.js"></script>
+    <script src="js/jquery.layout-1.4.0.js"></script>
     <script src="js/clsfilecreator.js"></script>
 </head>
 <body>
@@ -88,16 +89,21 @@
         <div id="sampleGrid"></div>
 
         <div id="assignClassDiv" class="w2ui-button">
-            <input type="image" src="images/black_right_arrow.png" id="assignClassBtn" height="32" width="52"/>
-            <br/>
-            <input type="image" src="images/black_left_arrow.png" id="unassignClassBtn" height="32" width="52"/>
-        </div>
-        <div class="w2ui-field w2ui-span3">
-            <div id="classSelector">
-                <label>Class: <input type="list" id="selectedClass"/></label>
+            <div>
+                <input type="image" src="images/black_right_arrow.png" id="assignClassBtn" height="32" width="52"/>
+            </div>
+            <div>
+                <input type="image" src="images/black_left_arrow.png" id="unassignClassBtn" height="32" width="52"/>
             </div>
         </div>
-        <div id="sampleAndClassGrid"></div>
+        <div id="sampleAndClassDiv">
+            <div class="w2ui-field w2ui-span3">
+                <div id="classSelector">
+                    <label>Class: <input type="list" id="selectedClass"/></label>
+                </div>
+            </div>
+            <div id="sampleAndClassGrid"></div>
+         </div>
     </div>
 
     <div id="step-4">
