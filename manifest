@@ -30,4 +30,4 @@ serializedModel=
 taskDoc=doc.html
 taskType=javascript
 userid=GenePattern (gp-help@broadinstitute.org)
-version=Fixed bug with missing samples and creation of the cls file, added display of the name of the loaded gct file, and addedba default name for the output cls file
+version=Improved layout and fixed display of the selected directory for saving to the Files tab
