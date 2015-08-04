@@ -3,6 +3,7 @@
 JVMLevel=
 LSID=urn\:lsid\:broad.mit.edu\:cancer.software.genepattern.module.visualizer\:00261\:999999999
 author=Marc-Danie Nazaire(Broad Institute)
+categories=Preprocess & Utilities
 commandLine=clsfilecreator.html ? <input.file>
 cpuType=any
 description=A tool to create a class label (CLS) file.
@@ -23,11 +24,11 @@ p1_value=
 pipelineModel=
 privacy=public
 publicationDate=04/08/2015 13\:04 
-quality=production
+quality=development
 requiredPatchLSIDs=urn\:lsid\:broadinstitute.org\:plugin\:GenePattern_3_9_3\:1,
 requiredPatchURLs=http\://www.broadinstitute.org/webservices/gpModuleRepository/download/prod/patch/?file\=/GenePattern_3_9_3/broadinstitute.org\:plugin/GenePattern_3_9_3/1/GenePattern_3_9_3.zip
 serializedModel=
 taskDoc=doc.html
 taskType=javascript
 userid=GenePattern (gp-help@broadinstitute.org)
-version=Improved layout and fixed display of the selected directory for saving to the Files tab
+version=Fixed height of viewer in Firefox and added categories property
