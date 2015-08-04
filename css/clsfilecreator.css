@@ -216,8 +216,9 @@
 }
 
 .swMain {
-    min-width: 1147px;
+    min-width: 1148px;
     width: 100%;
+    height: 100%;
     padding: 0;
     margin: 0;
 }
