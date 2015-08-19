@@ -1,3 +1,5 @@
+#updated after building 3.7
+#Tue, 04 Aug 2015 12:10:57 -0400
 #updated after building 3.6
 #Wed, 01 Jul 2015 12:14:34 -0400
 #updated after building 3.5
@@ -13,4 +15,4 @@
 #prerelease version number
 #Mon, 16 Jun 2014 15:35:55 -0400
 #Tue Jun 12 15:56:10 EDT 2012
-prerelease.number=7
+prerelease.number=8
