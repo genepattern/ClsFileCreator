@@ -155,6 +155,7 @@ function defineClasses()
     {
         w2ui['classesGrid'].resize()
     }
+
     if( w2ui['classToolbar'] == undefined) {
         $('#classToolbar').w2toolbar({
             name: 'classToolbar',
@@ -533,8 +534,8 @@ function init()
                 }
                 else
                 {
-                    $("#creator").smartWizard("hideError", 5);
-                    $("#creator").smartWizard('hideMessage');
+                   // $("#creator").smartWizard("hideError", 5);
+                   // $("#creator").smartWizard('hideMessage');
 
                     $('#gpDir').w2tag("");
                 }
@@ -544,11 +545,18 @@ function init()
 
                 var saveLocation = selectedGpDir + clsFileName;
                 console.log("save location: " + saveLocation);
-                gpLib.uploadDataToFilesTab(saveLocation, text, function(result)
+                gpLib.uploadDataToFilesTab(saveLocation, text, function(message)
                 {
-                    if(result !== "success")
+                    if(message !== "success")
                     {
-                        $("#creator").smartWizard('showMessage', "Error saving file. " + result);
+                        console.log("Error saving file: " + message);
+                        //limit the length of the error message on the screen
+                        if(message.length > 300)
+                        {
+                            message = message.substring(0, 300);
+                        }
+
+                        $("#creator").smartWizard('showMessage', "Error saving file. " + message);
                     }
                     else
                     {
@@ -573,7 +581,7 @@ function init()
         },
         onShowStep : function(obj, context)
         {
-            if(context.fromStep == 1 && context.toStep == 2)
+            if(context.toStep == 2)
             {
                 defineClasses();
             }

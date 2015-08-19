@@ -22,9 +22,17 @@ var gpLib = function() {
                     callBack("success");
                 }
             },
-            error: function (data, textStatus) {
-                console.log("Error: " + textStatus);
-                callBack("Error: " + textStatus)
+            error: function (data, textStatus)
+            {
+                var errorMessage = textStatus;
+
+                if(data != null && data != undefined
+                    && data.responseText != undefined && data.responseText != null)
+                {
+                    errorMessage = data.responseText;
+                }
+                console.log("Error: " + errorMessage);
+                callBack("Error: " + errorMessage);
             }
         });
     }
