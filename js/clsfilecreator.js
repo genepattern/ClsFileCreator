@@ -127,32 +127,34 @@ function listSamples(sampleNames)
 
 function defineClasses()
 {
-    if( w2ui['classesGrid'] !== undefined)
-    {
-        w2ui['classesGrid'].destroy();
+    if( w2ui['classesGrid'] === undefined) {
+        var btn = w2obj.grid.prototype.buttons;
+        delete btn['reload'];
+        delete btn['columns'];
+        btn['search-go'].caption = w2utils.lang('Filter...');
+        btn['search-go'].hint = w2utils.lang('');
+
+        $('#classesGrid').w2grid({
+            name: 'classesGrid',
+            show: {
+                footer: true,
+                selectColumn: true,
+                lineNumbers: true
+            },
+            multiSelect: true,
+            columns: [
+                { field: 'recid', caption: 'Index'},
+                {field: 'class', caption: 'Class', size: '100%', editable: false }
+            ],
+            sortData: [
+                { field: 'recid', direction: 'ASC' }
+            ]
+        });
     }
-
-    var btn = w2obj.grid.prototype.buttons;
-    delete btn['reload'];
-    delete btn['columns'];
-    btn['search-go'].caption = w2utils.lang('Filter...');
-    btn['search-go'].hint = w2utils.lang('');
-
-    $('#classesGrid').w2grid({
-        name   : 'classesGrid',
-        show: {
-            footer: true,
-            selectColumn: true,
-            lineNumbers    : true
-        },
-        multiSelect : true,
-        columns: [
-            { field: 'recid', caption: 'Index'},
-            {field: 'class', caption: 'Class', size: '100%', editable: false }
-        ],
-        sortData: [{ field: 'recid', direction: 'ASC' }]
-    });
-
+    else
+    {
+        w2ui['classesGrid'].resize()
+    }
     if( w2ui['classToolbar'] == undefined) {
         $('#classToolbar').w2toolbar({
             name: 'classToolbar',
@@ -163,7 +165,6 @@ function defineClasses()
                         '</div>'
                 },
                 { type: 'button', id: 'add', caption: 'Add Class', icon: 'w2ui-icon-plus' },
-                { type: 'break', id: 'break1' },
                 { type: 'button', id: 'delete', caption: 'Delete Class', icon: 'w2ui-icon-cross' }//,
             ],
             onClick: function (event) {
@@ -207,7 +208,7 @@ function defineClasses()
 
                             classNamesList.splice($.inArray(clssName, classNamesList),1);
 
-                            console.log("deleted class" + clssName);
+                            console.log("deleted class " + clssName);
                         }
 
                         if(classNamesList.length == 0)
@@ -254,68 +255,100 @@ function assignSamplesToClasses()
     }
 
     //delete any existing samples grid
-    if( w2ui['sampleAndClassGrid'] !== undefined)
+    if( w2ui['sampleAndClassGrid'] == undefined)
     {
-        w2ui['sampleAndClassGrid'].destroy();
-        w2ui['sampleGrid'].destroy();
+        var btn = w2obj.grid.prototype.buttons;
+        delete btn['reload'];
+        delete btn['columns'];
+
+        $('#sampleGrid').w2grid({
+            name   : 'sampleGrid',
+            header: 'Samples',
+            show: {
+                selectColumn: true,
+                toolbar: true,
+                footer: true,
+                header: true,
+                lineNumbers: true
+            },
+            multiSearch: true,
+            searches: [
+                { field: 'sample', caption: 'Sample Name', type: 'text' }
+            ],
+            columns: [
+                { field: 'recid', caption: 'Index'},
+                {field: 'sample', caption: 'Sample Name', size: '100%' }
+            ],
+            sortData: [{ field: 'recid', direction: 'ASC' },
+                { field: 'sample', direction: 'ASC' }],
+            records: sampleRecords
+        });
+
+        $('#sampleAndClassGrid').w2grid({
+            name   : 'sampleAndClassGrid',
+            show: {
+                selectColumn: true,
+                toolbar: false,
+                footer: true,
+                lineNumbers: true//,
+            },
+            multiSearch: false,
+            searches: [
+                { field: 'class', caption: 'Class', type: 'text' }
+            ],
+            columns: [
+                { field: 'recid', caption: 'Index'},
+                {field: 'sample', caption: 'Sample Name', size: '100%' },
+                { field: 'class', caption: 'Class', type: 'text' }
+            ],
+            sortData: [{ field: 'recid', direction: 'ASC' }
+            ]
+        });
     }
-
-    var btn = w2obj.grid.prototype.buttons;
-    delete btn['reload'];
-    delete btn['columns'];
-
-    $('#sampleGrid').w2grid({
-        name   : 'sampleGrid',
-        header: 'Samples',
-        show: {
-            selectColumn: true,
-            toolbar: true,
-            footer: true,
-            header: true,
-            lineNumbers: true
-        },
-        multiSearch: true,
-        searches: [
-            { field: 'sample', caption: 'Sample Name', type: 'text' }
-        ],
-        columns: [
-            { field: 'recid', caption: 'Index'},
-            {field: 'sample', caption: 'Sample Name', size: '100%' }
-        ],
-        sortData: [{ field: 'recid', direction: 'ASC' },
-            { field: 'sample', direction: 'ASC' }],
-        records: sampleRecords
-    });
-
-    $('#sampleAndClassGrid').w2grid({
-        name   : 'sampleAndClassGrid',
-        show: {
-            selectColumn: true,
-            toolbar: false,
-            footer: true,
-            lineNumbers: true//,
-        },
-        multiSearch: false,
-        searches: [
-            { field: 'class', caption: 'Class', type: 'text' }
-        ],
-        columns: [
-            { field: 'recid', caption: 'Index'},
-            {field: 'sample', caption: 'Sample Name', size: '100%' },
-            { field: 'class', caption: 'Class', type: 'text' }
-        ],
-        sortData: [{ field: 'recid', direction: 'ASC' }
-        ]
-    });
+    else
+    {
+        w2ui['sampleAndClassGrid'].resize();
+        w2ui['sampleGrid'].resize();
+    }
 
     w2ui['sampleAndClassGrid'].hideColumn('recid');
     w2ui['sampleAndClassGrid'].hideColumn('class');
 
-    $('#selectedClass').w2field('list', { items: classNamesList, selected: classNamesList[0] });
-    $('#selectedClass').change(function()
+    $("#selectedClass").empty();
+
+    for(var i=0;i<classNamesList.length;i++)
+    {
+        var numSamplesInClass = w2ui['sampleAndClassGrid'].find({ class:  classNamesList[i] }).length;
+        $("#selectedClass").append('<option value="'+ classNamesList[i] +'">' +classNamesList[i] + "("+ numSamplesInClass + ")" +"</option>");
+    }
+
+    var sampleAndClassRecords =  w2ui['sampleAndClassGrid'].records;
+    var recordsToRemove = [];
+
+    for(var r=0;r< sampleAndClassRecords.length;r++)
+    {
+        var classAssignment = sampleAndClassRecords[r].class;
+        if($.inArray(classAssignment, classNamesList) == -1)
+        {
+            recordsToRemove.push(sampleAndClassRecords[r].recid);
+            w2ui['sampleGrid'].add(
+            {
+                recid: sampleAndClassRecords[r].recid,
+                sample: sampleAndClassRecords[r].sample
+            });
+        }
+    }
+
+    for(var v=0;v<recordsToRemove.length;v++)
+    {
+        w2ui['sampleAndClassGrid'].remove(recordsToRemove[v]);
+    }
+
+    $("#selectedClass").change(function()
     {
         //show only samples with this class
-        w2ui['sampleAndClassGrid'].search("class", $(this).val());
+        var className = $(this).val();
+        w2ui['sampleAndClassGrid'].search("class", className);
         w2ui['sampleAndClassGrid'].hideSearch('class');
     });
 
@@ -555,6 +588,24 @@ function init()
         }
     });
 
+    var updateNumSamplesAssigned = function(className, length)
+    {
+        var numExistingSamplesInClass = $('#selectedClass').data(className+"Size");
+        if(numExistingSamplesInClass === undefined)
+        {
+            numExistingSamplesInClass = 0;
+        }
+        else
+        {
+            numExistingSamplesInClass = parseInt(numExistingSamplesInClass);
+        }
+        var numSamplesInClass = length + numExistingSamplesInClass;
+
+        $("#selectedClass").find("option[value='"+ $("#selectedClass").val() +"']").text(className + " (" + numSamplesInClass + ")" );
+
+        $("#selectedClass").data(className+"Size", numSamplesInClass);
+    };
+
     $("#assignClassBtn").click(function()
     {
         var className = $("#selectedClass").val();
@@ -581,31 +632,19 @@ function init()
         var classNameIndex = $.inArray(className, classNamesList);
         var list = classNamesList.slice();
 
-        var numExistingSamplesInClass = $('#selectedClass').data(className);
-        if(numExistingSamplesInClass === undefined)
-        {
-            numExistingSamplesInClass = 0;
-        }
-        else
-        {
-            numExistingSamplesInClass = parseInt(numExistingSamplesInClass);
-        }
-        var numSamplesInClass = selectedSamples.length + numExistingSamplesInClass;
-        list[classNameIndex] = className + " (" + numSamplesInClass + ")";
-
-        $('#selectedClass').data(className, numSamplesInClass);
-        $('#selectedClass').w2field('list', { items: list, selected: list[classNameIndex] });
-
+        updateNumSamplesAssigned(className, selectedSamples.length);
     });
 
     $("#unassignClassBtn").click(function()
     {
         var selectedSamples = w2ui['sampleAndClassGrid'].getSelection();
 
+        var className = "";
         for(var s=0;s<selectedSamples.length;s++)
         {
             var node =  w2ui['sampleAndClassGrid'].get(selectedSamples[s]);
             var recordId = node.recid;
+            className = node.class;
             w2ui['sampleGrid'].add(
                 {
                     recid: recordId,
@@ -617,6 +656,8 @@ function init()
         }
 
         w2ui['sampleAndClassGrid'].selectNone();
+
+        updateNumSamplesAssigned(className, selectedSamples.length);
     });
 
     $("#selectGpDir").hide();

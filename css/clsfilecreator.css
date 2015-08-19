@@ -257,7 +257,7 @@ button.btn
     cursor: pointer;
 }
 
-#tb_classToolbar_item_add, #tb_classToolbar_item_delete
+/*#tb_classToolbar_item_add, #tb_classToolbar_item_delete
 {
     display: inline-block;
     border-radius: 4px;
@@ -315,7 +315,7 @@ button.btn
     background: #f7f7f7 !important;
     color: #bdbcbc !important;
     text-shadow: none !important;
-}
+}*/
 
 #fileLoaded
 {
