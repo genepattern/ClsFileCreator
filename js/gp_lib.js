@@ -1,4 +1,39 @@
+$(function()
+{
+    //setup the global Authorization token
+    var token = window.location.hash;
+    if(token !== undefined && token !== null && token.length > 0)
+    {
+        $.ajaxSetup({
+            headers: {"Authorization": "Bearer " + token}
+        });
+    }
+});
+
 var gpLib = function() {
+    /**
+     * Uploads a file to the GP Files Tab
+     * @param url - the url of the file on the GP server
+     * @param data - the contents of the file
+     * @param callBack - a callback function if the upload was successful
+     */
+    function getGPFile(fileURL, successCallBack, failCallBack)
+    {
+        $.ajax({
+            contentType: 'text/plain',
+            url: fileURL
+        }).done(function (response, status, xhr) {
+            if(successCallBack != undefined && $.isFunction(successCallBack))
+            {
+                successCallBack(response);
+            }
+        }).fail(function (response, status, xhr)
+        {
+            if(failCallBack != undefined && $.isFunction(failCallBack)) {
+                failCallBack(response);
+            }
+        });
+    }
 
     /**
      * Uploads a file to the GP Files Tab
@@ -72,7 +107,8 @@ var gpLib = function() {
     // declare 'public' functions
     return {
         saveToGPDialog: saveToGPDialog,
-        uploadDataToFilesTab: uploadDataToFilesTab
+        uploadDataToFilesTab: uploadDataToFilesTab,
+        getGPFile: getGPFile
     };
 }
 

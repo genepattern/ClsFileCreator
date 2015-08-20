@@ -12,23 +12,16 @@ function generateNewId()
     return ++idIncrement;
 }
 
-function displayLoadError(errorMsg)
+function displayLoadError(response)
 {
+    var errorMsg = response.statusText;
     $("#creator").empty();
     $("#creator").append("<h3>There was an error loading the ClsFileCreator. Error: " + errorMsg +"</h3>");
 }
 
 function parseGCTFile(fileURL)
 {
-    $.ajax({
-        contentType: 'text/plain',
-        url: fileURL
-    }).done(function (response, status, xhr) {
-        loadSamples(response);
-    }).fail(function (response, status, xhr)
-    {
-        displayLoadError(response.statusText);
-    });
+    gpLib.getGPFile(fileURL, loadSamples, displayLoadError);
 }
 
 function loadSamples(fileContents)
