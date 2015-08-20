@@ -195,6 +195,16 @@ function defineClasses()
                         }
 
                         $("#classInput").val("");
+
+                        //a critical change was made so disable next steps
+                        // and hide any errors in those steps
+                        $("#creator").smartWizard("disableStep", 3);
+                        $("#creator").smartWizard("disableStep", 4);
+                        $("#creator").smartWizard("disableStep", 5);
+
+                        $("#creator").smartWizard("hideError", 3);
+                        $("#creator").smartWizard("hideError", 4);
+                        $("#creator").smartWizard("hideError", 5);
                         break;
                     case 'delete':
                         var selectedClasses = w2ui['classesGrid'].getSelection();
@@ -202,10 +212,6 @@ function defineClasses()
                         for (var c = 0; c < selectedClasses.length; c++) {
                             var clssName = w2ui['classesGrid'].get(selectedClasses[c]).class;
                             w2ui['classesGrid'].remove(selectedClasses[c]);
-
-                            //remove the class from the list of assign classes
-                           // var classNameIndex = classNamesList.indexOf(clssName);
-                           // classNamesList.slice(classNameIndex, 1);
 
                             classNamesList.splice($.inArray(clssName, classNamesList),1);
 
@@ -217,6 +223,15 @@ function defineClasses()
                             $("#tb_classToolbar_item_delete").attr("disabled", "disabled");
                         }
 
+                        //a critical change was made so disable next steps
+                        // and hide any errors in those steps
+                        $("#creator").smartWizard("disableStep", 3);
+                        $("#creator").smartWizard("disableStep", 4);
+                        $("#creator").smartWizard("disableStep", 5);
+
+                        $("#creator").smartWizard("hideError", 3);
+                        $("#creator").smartWizard("hideError", 4);
+                        $("#creator").smartWizard("hideError", 5);
                         break;
                 }
             }
@@ -454,6 +469,7 @@ function init()
     $("#creator").smartWizard({
         keyNavigation: false,
         labelFinish: "Save",
+        noForwardJumping: true,
         onLeaveStep : function(obj, context)
         {
             if(context.fromStep == 1 && context.toStep == 2)
@@ -534,9 +550,6 @@ function init()
                 }
                 else
                 {
-                   // $("#creator").smartWizard("hideError", 5);
-                   // $("#creator").smartWizard('hideMessage');
-
                     $('#gpDir').w2tag("");
                 }
 
@@ -616,6 +629,14 @@ function init()
 
     $("#assignClassBtn").click(function()
     {
+        //a critical change was made so disable next steps
+        // and hide any errors in those steps
+        $("#creator").smartWizard("disableStep", 4);
+        $("#creator").smartWizard("disableStep", 5);
+
+        $("#creator").smartWizard("hideError", 4);
+        $("#creator").smartWizard("hideError", 5);
+
         var className = $("#selectedClass").val();
 
         var selectedSamples = w2ui['sampleGrid'].getSelection();
@@ -645,6 +666,14 @@ function init()
 
     $("#unassignClassBtn").click(function()
     {
+        //a critical change was made so disable next steps
+        // and hide any errors in those steps
+        $("#creator").smartWizard("disableStep", 4);
+        $("#creator").smartWizard("disableStep", 5);
+
+        $("#creator").smartWizard("hideError", 4);
+        $("#creator").smartWizard("hideError", 5);
+
         var selectedSamples = w2ui['sampleAndClassGrid'].getSelection();
 
         var className = "";
