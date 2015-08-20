@@ -31,4 +31,4 @@ serializedModel=
 taskDoc=doc.html
 taskType=javascript
 userid=GenePattern (gp-help@broadinstitute.org)
-version=Fixed height of viewer in Firefox and added categories property
+version=Added passing of OAuth2 token to ajax calls and resolved removing and adding class sometimes require double click, using Previous button results in lost of info and resizing causes display issues.
