@@ -1,36 +1,61 @@
+var gpAuthorizationHeaders = {};
+
 $(function()
 {
     //setup the global Authorization token
     var token = window.location.hash;
     if(token !== undefined && token !== null && token.length > 0)
     {
+        gpAuthorizationHeaders = {"Authorization": "Bearer " + token};
         $.ajaxSetup({
-            headers: {"Authorization": "Bearer " + token}
+            headers: gpAuthorizationHeaders
         });
     }
 });
 
-var gpLib = function() {
+var gpLib = function()
+{
     /**
-     * Uploads a file to the GP Files Tab
-     * @param url - the url of the file on the GP server
-     * @param data - the contents of the file
-     * @param callBack - a callback function if the upload was successful
+     * Retrieves the contents of a file from a URL
+     * @param fileURL
+     * @param callBack
      */
-    function getGPFile(fileURL, successCallBack, failCallBack)
+    function getDataAtUrl(fileURL, options)
     {
+        var credentials = false;
+        if(fileURL.indexOf("https://") === 0)
+        {
+            credentials = true;
+        }
+
+        if(options == undefined)
+        {
+            options = {
+                headers: {}
+            };
+        }
+
+        $.extend(options.headers, gpAuthorizationHeaders);
+
         $.ajax({
-            contentType: 'text/plain',
-            url: fileURL
+            contentType: null,
+            url: fileURL,
+            headers: options.headers,
+            xhrFields: {
+                withCredentials: credentials
+            },
+            crossDomain: true
         }).done(function (response, status, xhr) {
-            if(successCallBack != undefined && $.isFunction(successCallBack))
+            if($.isFunction(options.successCallBack))
             {
-                successCallBack(response);
+                options.successCallBack(response);
             }
         }).fail(function (response, status, xhr)
         {
-            if(failCallBack != undefined && $.isFunction(failCallBack)) {
-                failCallBack(response);
+            console.log(response.statusText);
+            if($.isFunction(options.failCallBack))
+            {
+                options.failCallBack(response);
             }
         });
     }
@@ -108,7 +133,7 @@ var gpLib = function() {
     return {
         saveToGPDialog: saveToGPDialog,
         uploadDataToFilesTab: uploadDataToFilesTab,
-        getGPFile: getGPFile
+        getDataAtUrl: getDataAtUrl
     };
 }
 

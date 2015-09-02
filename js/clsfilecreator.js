@@ -21,7 +21,11 @@ function displayLoadError(response)
 
 function parseGCTFile(fileURL)
 {
-    gpLib.getGPFile(fileURL, loadSamples, displayLoadError);
+    gpLib.getDataAtUrl(fileURL,
+    {
+        successCallBack: loadSamples,
+        failCallBack:  displayLoadError
+    });
 }
 
 function loadSamples(fileContents)
