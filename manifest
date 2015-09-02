@@ -31,4 +31,4 @@ serializedModel=
 taskDoc=doc.html
 taskType=javascript
 userid=GenePattern (gp-help@broadinstitute.org)
-version=Added passing of OAuth2 token to ajax calls and resolved removing and adding class sometimes require double click, using Previous button results in lost of info and resizing causes display issues.
+version=Modified to work with data hosted via http
