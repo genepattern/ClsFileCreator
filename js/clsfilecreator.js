@@ -57,16 +57,23 @@ function listSamples(sampleNames)
     controls.append($("<button class='btn'>Check All</button>").attr("id", "checkAllSamples").click(function()
     {
         $("#sampleTable").find("input:checkbox").prop('checked', true);
+        $("#sampleTable").find("input:checkbox").trigger("change");
+
     }));
 
     controls.append($("<button class='btn'>Uncheck All</button>").attr("id", "uncheckAllSamples").click(function()
     {
         $("#sampleTable").find("input:checkbox").prop('checked', false);
+        $("#sampleTable").find("input:checkbox").trigger("change");
     }));
 
     $("#step-1").append(controls);
 
     var table = $("<table/>").attr("id", "sampleTable");
+    var div = $("<div/>");
+    div.append(table);
+    $("#step-1").append(div);
+
     var tableRow = null;
 
     var surplusRow = sampleNames.length % 4;
@@ -85,7 +92,7 @@ function listSamples(sampleNames)
             {
                 tableRow.append("<td>" + (index + 1) + ".</td>");
 
-                var checkBox = $("<input type='checkbox'/>").click(function()
+                var checkBox = $("<input type='checkbox'/>").change(function()
                 {
                     var sampleIndex = $.inArray( $(this).data("sample"), selectedSamplesList);
 
@@ -105,20 +112,17 @@ function listSamples(sampleNames)
                     }
                 });
 
-                checkBox.data("sample", sampleNames[index]);
-                checkBox.click();
-
                 var tableData = $("<td/>");
                 tableData.append(checkBox);
+
                 tableData.append(sampleNames[index]);
                 tableRow.append(tableData);
+
+                checkBox.data("sample", sampleNames[index]);
+                checkBox.click();
             }
         }
     }
-
-    var div = $("<div/>");
-    div.append(table);
-    $("#step-1").append(div);
 }
 
 
