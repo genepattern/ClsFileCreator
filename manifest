@@ -31,4 +31,4 @@ serializedModel=
 taskDoc=doc.html
 taskType=javascript
 userid=GenePattern (gp-help@broadinstitute.org)
-version=Modified to work with data hosted via http
+version=GPAT-1936 - Fixed bug with selecting samples on Step 1 in Firefox
