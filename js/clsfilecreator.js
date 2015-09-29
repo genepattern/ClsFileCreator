@@ -12,11 +12,11 @@ function generateNewId()
     return ++idIncrement;
 }
 
-function displayLoadError(response)
+function displayLoadError(errorMessage)
 {
-    var errorMsg = response.statusText;
+    var errorMsg = errorMessage;
     $("#creator").empty();
-    $("#creator").append("<h3>There was an error loading the ClsFileCreator. Error: " + errorMsg +"</h3>");
+    $("#creator").append("<h3 style='color:red'>There was an error loading the ClsFileCreator: <p>Error: " + errorMsg +"</p></h3>");
 }
 
 function parseGCTFile(fileURL)

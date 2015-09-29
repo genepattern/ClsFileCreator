@@ -22,6 +22,16 @@ var gpLib = function()
      */
     function getDataAtUrl(fileURL, options)
     {
+        //if the URL is an ftp url then fail
+        if(fileURL.indexOf("ftp://") ===0)
+        {
+            var errorMsg = "FTP files are not supported.";
+            if($.isFunction(options.failCallBack)) {
+                options.failCallBack(errorMsg);
+            }
+            throw new Error(errorMsg);
+        }
+
         var credentials = false;
         if(fileURL.indexOf("https://") === 0)
         {
@@ -55,7 +65,7 @@ var gpLib = function()
             console.log(response.statusText);
             if($.isFunction(options.failCallBack))
             {
-                options.failCallBack(response);
+                options.failCallBack(response.statusText, response);
             }
         });
     }
