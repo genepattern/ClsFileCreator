@@ -24,7 +24,7 @@ p1_value=
 pipelineModel=
 privacy=public
 publicationDate=04/08/2015 13\:04 
-quality=development
+quality=preproduction
 requiredPatchLSIDs=urn\:lsid\:broadinstitute.org\:plugin\:GenePattern_3_9_3\:1,
 requiredPatchURLs=http\://www.broadinstitute.org/webservices/gpModuleRepository/download/prod/patch/?file\=/GenePattern_3_9_3/broadinstitute.org\:plugin/GenePattern_3_9_3/1/GenePattern_3_9_3.zip
 serializedModel=
