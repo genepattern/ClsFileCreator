@@ -394,19 +394,22 @@ function assignSamplesToClasses()
     var sampleAndClassRecords =  w2ui['sampleAndClassGrid'].records;
     var recordsToRemove = [];
 
+    var newSamplesAndClasses = [];
     for(var r=0;r< sampleAndClassRecords.length;r++)
     {
         var classAssignment = sampleAndClassRecords[r].class;
         if($.inArray(classAssignment, classNamesList) == -1)
         {
             recordsToRemove.push(sampleAndClassRecords[r].recid);
-            w2ui['sampleGrid'].add(
+            newSamplesAndClasses.push(
             {
                 recid: sampleAndClassRecords[r].recid,
                 sample: sampleAndClassRecords[r].sample
             });
         }
     }
+
+    w2ui['sampleGrid'].add(newSamplesAndClasses);
 
     for(var v=0;v<recordsToRemove.length;v++)
     {
