@@ -7,24 +7,76 @@ var selectedGpDir = null;
 var gctFile; //URL to the gct file
 var gctFileName; //name of the gct file
 
+var gctFileContents = "";
+
 function generateNewId()
 {
     return ++idIncrement;
 }
 
-function displayLoadError(errorMessage)
+function displayLoadError(errorMessage, response)
 {
     var errorMsg = errorMessage;
     $("#creator").empty();
     $("#creator").append("<h3 style='color:red'>There was an error loading the ClsFileCreator: <p>Error: " + errorMsg +"</p></h3>");
 }
 
+function getFileContentsUsingByteRequests(fileURL, maxNumLines, startBytes, byteIncrement, fileContents)
+{
+    var getMoreLines = false;
+
+    if(startBytes != undefined && startBytes >= 0)
+    {
+        if(fileContents != undefined)
+        {
+            gctFileContents += fileContents;
+        }
+        var result = gctFileContents.match(/\n/g);
+        if(result == undefined || (result != null && result.length < maxNumLines))
+        {
+            getMoreLines = true;
+            gpLib.readBytesFromURL(fileURL, maxNumLines, startBytes, byteIncrement,
+            {
+                successCallBack: getFileContentsUsingByteRequests,
+                failCallBack: displayLoadError
+            });
+        }
+    }
+
+    if(!getMoreLines)
+    {
+        if(gctFileContents != undefined && gctFileContents.length > 0)
+        {
+            loadSamples(gctFileContents);
+        }
+        else
+        {
+            displayLoadError("data is empty");
+        }
+    }
+}
+
 function parseGCTFile(fileURL)
 {
-    gpLib.getDataAtUrl(fileURL,
+    gpLib.rangeRequestsAllowed(fileURL,
     {
-        successCallBack: loadSamples,
-        failCallBack:  displayLoadError
+        successCallBack: function(acceptRanges)
+        {
+            if(acceptRanges)
+            {
+                //get the third data row in order to get the sample names
+                getFileContentsUsingByteRequests(fileURL, 3, 0, 5000);
+            }
+            else
+            {
+                gpLib.getDataAtUrl(fileURL,
+                {
+                    successCallBack: loadSamples,
+                    failCallBack:  displayLoadError
+                });
+            }
+        },
+        failCallBack: displayLoadError
     });
 }
 

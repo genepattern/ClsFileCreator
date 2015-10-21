@@ -15,6 +15,173 @@ $(function()
 
 var gpLib = function()
 {
+    function rangeRequestsAllowed(fileURL, options)
+    {
+        //if the URL is an ftp url then fail
+        if(fileURL.indexOf("ftp://") === 0)
+        {
+            var errorMsg = "FTP files are not supported.";
+            if($.isFunction(options.failCallBack)) {
+                options.failCallBack(errorMsg);
+            }
+            throw new Error(errorMsg);
+        }
+        var credentials = false;
+        if(fileURL.indexOf("https://") === 0)
+        {
+            credentials = true;
+        }
+
+        if(options === undefined)
+        {
+            options = {};
+        }
+
+        if(options.headers === undefined)
+        {
+            options.headers =  {}
+        }
+
+        $.extend(options.headers, gpAuthorizationHeaders);
+
+        $.ajax({
+            contentType: null,
+            method: "HEAD",
+            url: fileURL,
+            headers: options.headers,
+            xhrFields: {
+                withCredentials: credentials
+            },
+            crossDomain: true
+        }).done(function (response, status, xhr)
+        {
+            var allowRangeRequests = false;
+            var acceptRanges = xhr.getResponseHeader("Accept-Ranges");
+            if(acceptRanges === "bytes")
+            {
+                allowRangeRequests = true;
+            }
+
+            if($.isFunction(options.successCallBack))
+            {
+                options.successCallBack(allowRangeRequests, response);
+            }
+        }).fail(function (response, status, xhr)
+        {
+            if($.isFunction(options.failCallBack))
+            {
+                options.failCallBack(response.statusText, response);
+            }
+        });
+    }
+
+    function readBytesFromURL(fileURL, maxNumLines, byteStart, byteIncrement, options)
+    {
+        if(byteStart === "")
+        {
+            alert("No starting byte specified for range request");
+            return;
+        }
+
+        //if the URL is an ftp url then fail
+        if(fileURL.indexOf("ftp://") === 0)
+        {
+            var errorMsg = "FTP files are not supported.";
+            if($.isFunction(options.failCallBack)) {
+                options.failCallBack(errorMsg);
+            }
+            throw new Error(errorMsg);
+        }
+        var credentials = false;
+        if(fileURL.indexOf("https://") === 0)
+        {
+            credentials = true;
+        }
+
+        if(options === undefined)
+        {
+            options = {};
+        }
+
+        if(options.headers === undefined)
+        {
+            options.headers =  {}
+
+        }
+
+        var byteEnd = "";
+        //if no byte increment is specified then default to +1000000 bytes from start
+        if(byteIncrement === undefined || byteIncrement === null)
+        {
+            byteIncrement = 1000000;
+        }
+
+        //byteIncrement is empty then do not set an ending byte range
+        if(byteIncrement != "")
+        {
+           byteEnd = byteStart + byteIncrement;
+        }
+
+        //get all bytes since to max is specified
+        if(byteEnd == -1)
+        {
+            byteEnd = "";
+        }
+
+        //Just in case byte range requests are allowed
+        if(options.headers.Range == undefined)
+        {
+            $.extend(options.headers, {"Range" : "bytes=" + byteStart + "-" + byteEnd});
+        }
+
+        $.extend(options.headers, gpAuthorizationHeaders);
+
+        $.ajax({
+            contentType: null,
+            url: fileURL,
+            headers: options.headers,
+            xhrFields: {
+                withCredentials: credentials
+            },
+            crossDomain: true
+        }).done(function (response, status, xhr) {
+            if($.isFunction(options.successCallBack))
+            {
+                byteStart = byteEnd + 1;
+
+                var contentRange = xhr.getResponseHeader("Content-Range");
+                var result = contentRange.split("/");
+
+                byteEnd = byteStart + byteIncrement;
+                if(result.length >= 2)
+                {
+                    var length = parseInt(result[1]);
+                    if(byteEnd > length)
+                    {
+                        byteEnd = length;
+                    }
+
+                    if(byteStart > length)
+                    {
+                        byteStart = "";
+                        byteEnd = "";
+                    }
+                }
+
+                console.log("byteStart: " + byteStart);
+                console.log("byteEnd: " + byteEnd);
+                options.successCallBack(fileURL, maxNumLines, byteStart, byteIncrement, response);
+            }
+        }).fail(function (response, status, xhr)
+        {
+            console.log(response.statusText);
+            if($.isFunction(options.failCallBack))
+            {
+                options.failCallBack(response.statusText, response);
+            }
+        });
+    }
+
     /**
      * Retrieves the contents of a file from a URL
      * @param fileURL
@@ -40,9 +207,13 @@ var gpLib = function()
 
         if(options == undefined)
         {
-            options = {
-                headers: {}
-            };
+            options = {};
+        }
+
+        if(options.headers == undefined)
+        {
+            options.headers =  {}
+
         }
 
         $.extend(options.headers, gpAuthorizationHeaders);
@@ -143,7 +314,9 @@ var gpLib = function()
     return {
         saveToGPDialog: saveToGPDialog,
         uploadDataToFilesTab: uploadDataToFilesTab,
-        getDataAtUrl: getDataAtUrl
+        getDataAtUrl: getDataAtUrl,
+        readBytesFromURL: readBytesFromURL,
+        rangeRequestsAllowed: rangeRequestsAllowed
     };
 }
 
