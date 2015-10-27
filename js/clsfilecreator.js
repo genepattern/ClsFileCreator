@@ -25,12 +25,13 @@ function getFileContentsUsingByteRequests(fileURL, maxNumLines, startBytes, byte
 {
     var getMoreLines = false;
 
+    if(fileContents != undefined)
+    {
+        gctFileContents = gctFileContents.concat(fileContents);
+    }
+
     if(startBytes != undefined && startBytes >= 0)
     {
-        if(fileContents != undefined)
-        {
-            gctFileContents += fileContents;
-        }
         var result = gctFileContents.match(/\n/g);
         if(result == undefined || (result != null && result.length < maxNumLines))
         {
@@ -58,6 +59,14 @@ function getFileContentsUsingByteRequests(fileURL, maxNumLines, startBytes, byte
 
 function parseGCTFile(fileURL)
 {
+    var alternativeLoading = function()
+    {
+        gpLib.getDataAtUrl(fileURL,
+            {
+                successCallBack: loadSamples,
+                failCallBack:  displayLoadError
+            });
+    };
     gpLib.rangeRequestsAllowed(fileURL,
     {
         successCallBack: function(acceptRanges)
@@ -69,14 +78,10 @@ function parseGCTFile(fileURL)
             }
             else
             {
-                gpLib.getDataAtUrl(fileURL,
-                {
-                    successCallBack: loadSamples,
-                    failCallBack:  displayLoadError
-                });
+                alternativeLoading();
             }
         },
-        failCallBack: displayLoadError
+        failCallBack: alternativeLoading
     });
 }
 

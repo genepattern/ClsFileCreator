@@ -31,4 +31,4 @@ serializedModel=
 taskDoc=doc.html
 taskType=javascript
 userid=GenePattern (gp-help@broadinstitute.org)
-version=Added support for parsing files using byte range requests
+version=Improved handling when check for whether byte range requests are allowed fails
