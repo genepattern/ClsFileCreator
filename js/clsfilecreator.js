@@ -202,10 +202,10 @@ function defineClasses()
             multiSelect: true,
             columns: [
                 { field: 'recid', caption: 'Index'},
-                {field: 'class', caption: 'Class', size: '100%', editable: false }
+                {field: 'class', caption: 'Class', size: '100%', editable: false, sortable: true }
             ],
             sortData: [
-                { field: 'recid', direction: 'ASC' }
+                { field: 'recid', direction: 'asc' }
             ]
         });
     }
@@ -350,11 +350,11 @@ function assignSamplesToClasses()
                 { field: 'sample', caption: 'Sample Name', type: 'text' }
             ],
             columns: [
-                { field: 'recid', caption: 'Index'},
-                {field: 'sample', caption: 'Sample Name', size: '100%' }
+                { field: 'recid', caption: 'Index', sortable: true},
+                {field: 'sample', caption: 'Sample Name', size: '100%', sortable: true}
             ],
-            sortData: [{ field: 'recid', direction: 'ASC' },
-                { field: 'sample', direction: 'ASC' }],
+            sortData: [{ field: 'recid', direction: 'asc' },
+                { field: 'sample', direction: 'asc' }],
             records: sampleRecords
         });
 
@@ -364,7 +364,7 @@ function assignSamplesToClasses()
                 selectColumn: true,
                 toolbar: false,
                 footer: true,
-                lineNumbers: true//,
+                lineNumbers: true
             },
             multiSearch: false,
             searches: [
@@ -489,7 +489,9 @@ function createCls()
     text += "\n";
 
     var sampleRecords = w2ui['sampleAndClassGrid'].records;
-    for(var s=sampleNamesList.length-1;s>=0;s--)
+
+    //samples are added reverse order so need to traverse the list backwards
+    for(var s=sampleRecords.length-1;s>=0;s--)
     {
         var className = sampleRecords[s].class;
         var index = classNamesList.indexOf(className);
@@ -506,7 +508,7 @@ function createCls()
             });
         }
 
-        if(s !== sampleNamesList.length-1)
+        if(s !== sampleRecords.length-1)
         {
             text += " ";
         }
