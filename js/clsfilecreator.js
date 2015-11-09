@@ -545,9 +545,6 @@ function init()
                     $("#creator").smartWizard('showMessage', 'Error: No samples selected!');
                     return false;
                 }
-
-                //reset the list of class names
-                classNamesList = [];
             }
 
             if(context.fromStep == 2 && context.toStep == 3)
@@ -721,8 +718,8 @@ function init()
 
         w2ui['sampleGrid'].reset();
 
-        var classNameIndex = $.inArray(className, classNamesList);
-        var list = classNamesList.slice();
+        //var classNameIndex = $.inArray(className, classNamesList);
+        //var list = classNamesList.slice();
 
         updateNumSamplesAssigned(className, selectedSamples.length);
     });
@@ -739,25 +736,30 @@ function init()
 
         var selectedSamples = w2ui['sampleAndClassGrid'].getSelection();
 
-        var className = "";
-        for(var s=0;s<selectedSamples.length;s++)
-        {
-            var node =  w2ui['sampleAndClassGrid'].get(selectedSamples[s]);
-            var recordId = node.recid;
-            className = node.class;
-            w2ui['sampleGrid'].add(
-                {
-                    recid: recordId,
-                    sample: node.sample
-                });
+        if(selectedSamples.length > 0) {
+            var className = "";
+            for (var s = 0; s < selectedSamples.length; s++) {
+                var node = w2ui['sampleAndClassGrid'].get(selectedSamples[s]);
+                var recordId = node.recid;
+                className = node.class;
+                w2ui['sampleGrid'].add(
+                    {
+                        recid: recordId,
+                        sample: node.sample
+                    });
 
-            //remove it from the samples grid
-            w2ui['sampleAndClassGrid'].remove(recordId);
+                //remove it from the samples grid
+                w2ui['sampleAndClassGrid'].remove(recordId);
+            }
+
+            //decrease the tally of number of samples in the class by
+            // the number of samples just removed above
+            // var existingSamplesInClass = $("#selectedClass").data(className+"Size");
+            //("#selectedClass").data(className+"Size", existingSamplesInClass - selectedSamples.length);
+            w2ui['sampleAndClassGrid'].selectNone();
+
+            updateNumSamplesAssigned(className, Math.abs(selectedSamples.length) * -1);
         }
-
-        w2ui['sampleAndClassGrid'].selectNone();
-
-        updateNumSamplesAssigned(className, selectedSamples.length);
     });
 
     $("#selectGpDir").hide();
