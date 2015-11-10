@@ -31,4 +31,4 @@ serializedModel=
 taskDoc=doc.html
 taskType=javascript
 userid=GenePattern (gp-help@broadinstitute.org)
-version=Improved handling when check for whether byte range requests are allowed fails
+version=Improved error handling when loading files, fixed errors when a subset of samples are selected and also modified so that the save button is only enabled on the last step
