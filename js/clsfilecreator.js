@@ -6,6 +6,8 @@ var classNamesList = [];
 var selectedGpDir = null;
 var gctFile; //URL to the gct file
 var gctFileName; //name of the gct file
+var requestParams;
+
 
 var gctFileContents = "";
 
@@ -21,7 +23,7 @@ function displayLoadError(errorMessage, response)
     $("#creator").append("<h3 style='color:red'>There was an error loading the ClsFileCreator: <p>Error: " + errorMsg +"</p></h3>");
 }
 
-function getFileContentsUsingByteRequests(fileURL, maxNumLines, startBytes, byteIncrement, fileContents)
+function getFileContentsUsingByteRequests(fileURL, maxNumLines, startBytes, byteIncrement, fileContents, headers)
 {
     var getMoreLines = false;
 
@@ -38,6 +40,7 @@ function getFileContentsUsingByteRequests(fileURL, maxNumLines, startBytes, byte
             getMoreLines = true;
             gpLib.readBytesFromURL(fileURL, maxNumLines, startBytes, byteIncrement,
             {
+                headers: headers,
                 successCallBack: getFileContentsUsingByteRequests,
                 failCallBack: displayLoadError
             });
@@ -59,29 +62,44 @@ function getFileContentsUsingByteRequests(fileURL, maxNumLines, startBytes, byte
 
 function parseGCTFile(fileURL)
 {
-    var alternativeLoading = function()
+    var headers = {};
+
+    if(gpLib.isGenomeSpaceFile(fileURL))
+    {
+        if(requestParams["|gst"] !== undefined && requestParams["|gsu"] !== undefined) {
+            headers = {
+                "gs-token": requestParams["|gst"].join(),  //should only be one item
+                "gs-username": requestParams["|gsu"].join()
+            };
+        }
+    }
+
+    var alternativeFileLoading = function()
     {
         gpLib.getDataAtUrl(fileURL,
             {
+                headers: headers,
                 successCallBack: loadSamples,
                 failCallBack:  displayLoadError
             });
     };
+
     gpLib.rangeRequestsAllowed(fileURL,
     {
         successCallBack: function(acceptRanges)
         {
             if(acceptRanges)
             {
+                var fileContents = "";
                 //get the third data row in order to get the sample names
-                getFileContentsUsingByteRequests(fileURL, 3, 0, 5000);
+                getFileContentsUsingByteRequests(fileURL, 3, 0, 5000, fileContents, headers);
             }
             else
             {
-                alternativeLoading();
+                alternativeFileLoading();
             }
         },
-        failCallBack: alternativeLoading
+        failCallBack: alternativeFileLoading
     });
 }
 
@@ -454,9 +472,9 @@ function classAssignmentsSummary()
         var assignSamples = w2ui['sampleAndClassGrid'].find(
             { class:  className });
 
-        for(var a=0;a<assignSamples.length;a++)
+        for(var a=assignSamples.length-1; a >= 0;a--)
         {
-            if(a != 0)
+            if(a != (assignSamples.length - 1))
             {
                 samplesList += ", ";
             }
@@ -535,6 +553,12 @@ function init()
         noForwardJumping: true,
         onLeaveStep : function(obj, context)
         {
+            if(context.fromStep > context.toStep)
+            {
+                //$("#creator").smartWizard("enableFinish", false);
+                $(".buttonFinish").addClass("buttonDisabled");
+            }
+
             if(context.fromStep == 1 && context.toStep == 2)
             {
                 //$("#step-2").find(".StepTitle").after("<span>Loaded: " + gctFileName + "</span>");
@@ -654,6 +678,12 @@ function init()
         },
         onShowStep : function(obj, context)
         {
+            if(context.toStep != 5)
+            {
+                //$("#creator").smartWizard("enableFinish", false);
+                $(".buttonFinish").addClass("buttonDisabled");
+            }
+
             if(context.toStep == 2)
             {
                 defineClasses();
@@ -797,7 +827,7 @@ function init()
 }
 $(function()
 {
-    var requestParams = gpUtil.parseQueryString();
+    requestParams = gpUtil.parseQueryString();
 
     jobResultNumber = requestParams["job.number"];
 
@@ -830,7 +860,7 @@ $(function()
                 $("#clsFileName").val(gctFileName.replace(extension, ".cls"));
             }
 
-            $("#fileLoaded").append("<span>Loaded: <a href='" + gctFile + "'>" + gctFileName +"</a></span>");
+            $("#fileLoaded").append("<span>Loaded: <a href='" + gctFile + "' target='blank'>" + gctFileName +" </a></span>");
 
             parseGCTFile(inputFiles[t]);
         }
