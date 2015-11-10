@@ -77,10 +77,14 @@ var gpLib = function()
 
     function readBytesFromURL(fileURL, maxNumLines, byteStart, byteIncrement, options)
     {
-        if(byteStart === "")
+        if(byteStart === undefined || byteStart === null || byteStart === "")
         {
-            alert("No starting byte specified for range request");
-            return;
+            throw Error("No starting byte specified for range request");
+        }
+
+        if(byteStart < 0)
+        {
+            throw Error("Invalid starting byte specified for range request: " + byteStart);
         }
 
         //if the URL is an ftp url then fail
@@ -92,6 +96,7 @@ var gpLib = function()
             }
             throw new Error(errorMsg);
         }
+
         var credentials = false;
         if(fileURL.indexOf("https://") === 0)
         {
@@ -105,8 +110,7 @@ var gpLib = function()
 
         if(options.headers === undefined)
         {
-            options.headers =  {}
-
+            options.headers =  {};
         }
 
         var byteEnd = "";
@@ -119,10 +123,10 @@ var gpLib = function()
         //byteIncrement is empty then do not set an ending byte range
         if(byteIncrement != "")
         {
-           byteEnd = byteStart + byteIncrement;
+            byteEnd = byteStart + byteIncrement;
         }
 
-        //get all bytes since to max is specified
+        //get all bytes since max is not specified
         if(byteEnd == -1)
         {
             byteEnd = "";
@@ -158,18 +162,15 @@ var gpLib = function()
                     var length = parseInt(result[1]);
                     if(byteEnd > length)
                     {
-                        byteEnd = length;
+                        byteEnd = length-1;
                     }
 
                     if(byteStart > length)
                     {
-                        byteStart = "";
-                        byteEnd = "";
+                        byteStart = -1;
+                        byteEnd = -1;
                     }
                 }
-
-                console.log("byteStart: " + byteStart);
-                console.log("byteEnd: " + byteEnd);
                 options.successCallBack(fileURL, maxNumLines, byteStart, byteIncrement, response);
             }
         }).fail(function (response, status, xhr)
@@ -310,13 +311,27 @@ var gpLib = function()
         });
     }
 
+    function isGenomeSpaceFile(fileUrl)
+    {
+        var parser = $('<a/>');
+        parser.attr("href", fileUrl);
+
+        if(parser[0].hostname.indexOf("genomespace.org") != -1)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     // declare 'public' functions
     return {
         saveToGPDialog: saveToGPDialog,
         uploadDataToFilesTab: uploadDataToFilesTab,
         getDataAtUrl: getDataAtUrl,
         readBytesFromURL: readBytesFromURL,
-        rangeRequestsAllowed: rangeRequestsAllowed
+        rangeRequestsAllowed: rangeRequestsAllowed,
+        isGenomeSpaceFile: isGenomeSpaceFile
     };
 }
 
