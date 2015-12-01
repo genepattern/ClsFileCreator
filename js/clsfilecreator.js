@@ -34,7 +34,7 @@ function getFileContentsUsingByteRequests(fileURL, maxNumLines, startBytes, byte
 
     if(startBytes != undefined && startBytes >= 0)
     {
-        var result = gctFileContents.match(/\n/g);
+        var result = gctFileContents.match(/\r|\n/g);
         if(result == undefined || (result != null && result.length < maxNumLines))
         {
             getMoreLines = true;
