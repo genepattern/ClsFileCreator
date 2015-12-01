@@ -31,4 +31,4 @@ serializedModel=
 taskDoc=doc.html
 taskType=javascript
 userid=GenePattern (gp-help@broadinstitute.org)
-version=Improved error handling when loading files, fixed errors when a subset of samples are selected and also modified so that the save button is only enabled on the last step
+version=Fixed bug with parsing gct files with Windows line endings

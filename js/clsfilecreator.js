@@ -105,7 +105,7 @@ function parseGCTFile(fileURL)
 
 function loadSamples(fileContents)
 {
-    var lines = fileContents.split(/\n/);
+    var lines = fileContents.split(/\r|\n/);
 
     if(lines.length >= 4 && lines[0].indexOf("#1.2") != -1)
     {
