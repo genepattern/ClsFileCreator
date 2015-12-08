@@ -34,7 +34,7 @@ function getFileContentsUsingByteRequests(fileURL, maxNumLines, startBytes, byte
 
     if(startBytes != undefined && startBytes >= 0)
     {
-        var result = gctFileContents.match(/\r|\n/g);
+        var result = gctFileContents.match(/\r\n|\n|\r/g);
         if(result == undefined || (result != null && result.length < maxNumLines))
         {
             getMoreLines = true;
@@ -105,9 +105,9 @@ function parseGCTFile(fileURL)
 
 function loadSamples(fileContents)
 {
-    var lines = fileContents.split(/\r|\n/);
+    var lines = fileContents.split(/\r\n|\n|\r/);
 
-    if(lines.length >= 4 && lines[0].indexOf("#1.2") != -1)
+    if(lines.length >= 3 && lines[0].indexOf("#1.2") != -1)
     {
         //The samples
         var sampleLines = lines[2];
@@ -443,7 +443,7 @@ function assignSamplesToClasses()
     {
         //show only samples with this class
         var className = $(this).val();
-        w2ui['sampleAndClassGrid'].search("class", className);
+        w2ui['sampleAndClassGrid'].search([{field: "class", value: className, operator: "is"}]);
         w2ui['sampleAndClassGrid'].hideSearch('class');
     });
 
@@ -860,7 +860,7 @@ $(function()
                 $("#clsFileName").val(gctFileName.replace(extension, ".cls"));
             }
 
-            $("#fileLoaded").append("<span>Loaded: <a href='" + gctFile + "' target='blank'>" + gctFileName +" </a></span>");
+            $("#fileLoaded").append("<span>Loaded: <a href='" + gctFile + "' target='blank'>" + decodeURIComponent(gctFileName) +" </a></span>");
 
             parseGCTFile(inputFiles[t]);
         }
