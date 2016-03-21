@@ -31,4 +31,4 @@ serializedModel=
 taskDoc=doc.html
 taskType=javascript
 userid=GenePattern (gp-help@broadinstitute.org)
-version=Fixed bug with assigning class names which are subsets of other class names and parsing of gct files with Windows line endings
+version=Fix for authenticating from GP notebook
