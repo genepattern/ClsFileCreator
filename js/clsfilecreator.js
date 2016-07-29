@@ -699,6 +699,9 @@ function init()
         }
     });
 
+    // Hide the previous button
+    $(".buttonPrevious").hide();
+
     var updateNumSamplesAssigned = function(className, length)
     {
         var numExistingSamplesInClass = $('#selectedClass').data(className+"Size");
