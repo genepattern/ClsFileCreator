@@ -676,8 +676,26 @@ function init()
             }
             return true;
         },
-        onShowStep : function(obj, context)
-        {
+        onShowStep : function(obj, context) {
+            if (context.toStep == 2) {
+                $("#creator").smartWizard("disableStep", 1);
+            }
+            if (context.toStep == 3) {
+                $("#creator").smartWizard("disableStep", 1);
+                $("#creator").smartWizard("disableStep", 2);
+            }
+            if (context.toStep == 4) {
+                $("#creator").smartWizard("disableStep", 1);
+                $("#creator").smartWizard("disableStep", 2);
+                $("#creator").smartWizard("disableStep", 3);
+            }
+            if (context.toStep == 5) {
+                $("#creator").smartWizard("disableStep", 1);
+                $("#creator").smartWizard("disableStep", 2);
+                $("#creator").smartWizard("disableStep", 3);
+                $("#creator").smartWizard("disableStep", 4);
+            }
+
             if(context.toStep != 5)
             {
                 //$("#creator").smartWizard("enableFinish", false);
@@ -806,6 +824,8 @@ function init()
         {
             $("#selectGpDir").hide();
         }
+
+        $(".buttonFinish").removeClass("buttonDisabled");
     });
 
     $("#gpDir").click(function()
