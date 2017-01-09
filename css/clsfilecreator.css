@@ -16,19 +16,27 @@
 
 .swMain .stepContainer div.content
 {
-    overflow:auto;
     width: 100%;
+    background-color: transparent;
+    border: none;
 }
 
 .swMain .stepContainer
 {
-    overflow-y: hidden;
+    background-color:#F8F8F8;
+    border: 1px solid #CCC;
+    -webkit-border-radius: 5px;
+    -moz-border-radius  : 5px;
+}
+
+.swMain .stepContainer
+{
     width: 100%;
 }
 
 #sampleControls
 {
-    width: 200px; /*1130px;*/
+    width: 250px; /*1130px;*/
     font-size: 14px;
     padding-top: 4px;
     /*padding: 4px 0 4px 500px;*/
@@ -38,21 +46,36 @@
 
 #sampleGrid
 {
-    height: 268px;
-    width: 300px;
+    min-height: 340px;
+    height: 100%;
+    min-width: 100px;
+    width: 40%;
     float: left;
     margin-top: 3px;
-    margin-left: 140px;
+    margin-left: 20px;
 }
 
 #sampleAndClassGrid
 {
-    height: 239px;
-    width: 320px;
+    min-height: 200px;
+    height: 92%;
+    min-width: 100px;
+    width: 100%;
     float: left;
     margin-left: 17px;
     margin-top: 0;
 }
+
+#sampleAndClassDiv
+{
+    min-height: 200px;
+    height: 100%;
+    min-width: 100px;
+    width: 40%;
+    float: left;
+    margin-top: 0;
+}
+
 
 #classEntry
 {
@@ -83,41 +106,42 @@
 
 #classesGrid
 {
-    height: 225px;
-    width:  600px;
+    min-height: 100px;
+    width:  100%;
+    height: 100%;
     margin-right: 15px;
 }
 
 #selectedClass
 {
     height: 28px;
-    width: 278px; /*305px;*/
-    /*margin-left: 17px;*/
+    width: 278px;
 }
 
 #classSelector label
 {
-    margin-left: 17px;
+    margin-left: 14px;
 }
 
 #classSelector
 {
-    margin: 0 0 0 27px;
+    margin: 0;
 }
 
 #classToolbar
 {
     margin-top: 6px;
-    width: 600px;
+    width: 100%;
+    min-width: 100px;
 }
 
 #assignClassDiv
 {
     width: 65px;
     float: left;
-    margin-top: 100px;
-    margin-left: 3px;
-    margin-right: 3px;
+    margin-top: 130px;
+    /*margin-left: 3px;
+    margin-right: 3px;*/
 }
 
 #classAssignmentSummary
@@ -131,7 +155,7 @@
 
 #saveCLS
 {
-    width: 400px;
+    width: 520px;
     height: 200px;
     margin-left: auto;
     margin-right: auto;
@@ -192,7 +216,9 @@
 }
 
 .swMain {
-    width: 1155px;
+    min-width: 1165px;
+    width: 100%;
+    height: 100%;
     padding: 0;
     margin: 0;
 }
@@ -211,7 +237,7 @@
 
 .swMain ul.anchor li a {
     height:51px;
-    width:215px;
+    width:219px;
 }
 
 .swMain ul.anchor li a .stepDesc{
@@ -231,7 +257,7 @@ button.btn
     cursor: pointer;
 }
 
-#tb_classToolbar_item_add, #tb_classToolbar_item_delete
+/*#tb_classToolbar_item_add, #tb_classToolbar_item_delete
 {
     display: inline-block;
     border-radius: 4px;
@@ -289,6 +315,11 @@ button.btn
     background: #f7f7f7 !important;
     color: #bdbcbc !important;
     text-shadow: none !important;
+}*/
+
+#fileLoaded
+{
+    font-size: 13px;
 }
 
 

@@ -2,6 +2,7 @@
 #Wed Apr 08 13:14:00 EDT 2015
 JVMLevel=
 author=Marc-Danie Nazaire(Broad Institute)
+categories=Preprocess & Utilities
 commandLine=clsfilecreator.html ? <input.file>
 cpuType=any
 description=A tool to create a class label (CLS) file.
@@ -12,8 +13,8 @@ os=any
 p1_MODE=IN
 p1_TYPE=FILE
 p1_default_value=
-p1_description=A dataset - .gct, .res
-p1_fileFormat=gct;res
+p1_description=A dataset - .gct
+p1_fileFormat=gct
 p1_name=input.file
 p1_optional=
 p1_prefix_when_specified=
@@ -23,8 +24,10 @@ pipelineModel=
 privacy=public
 publicationDate=04/08/2015 13\:04 
 quality=production
+requiredPatchLSIDs=urn\:lsid\:broadinstitute.org\:plugin\:GenePattern_3_9_3\:1,
+requiredPatchURLs=http\://www.broadinstitute.org/webservices/gpModuleRepository/download/prod/patch/?file\=/GenePattern_3_9_3/broadinstitute.org\:plugin/GenePattern_3_9_3/1/GenePattern_3_9_3.zip
 serializedModel=
 taskDoc=doc.html
 taskType=javascript
 userid=GenePattern (gp-help@broadinstitute.org)
-version=Initial version
+version=JavaScript implementation
