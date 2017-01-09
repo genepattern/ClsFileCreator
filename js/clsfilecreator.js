@@ -7,8 +7,6 @@ var selectedGpDir = null;
 var gctFile; //URL to the gct file
 var gctFileName; //name of the gct file
 var requestParams;
-
-
 var gctFileContents = "";
 
 function generateNewId()
