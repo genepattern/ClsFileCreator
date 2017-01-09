@@ -124,7 +124,7 @@ var gpUtil = function() {
     /**
      * Parse the given query string of the form '?{name1}={value}&{name2}={value}&{flag}
      * @param the query string from a URL, for example window.location.search
-     *       If it is empty then it defaults to window.location.search
+     *        If it is empty then it defaults to window.location.search
      * @return a hash of decoded values, where the rhs value is an array. E.g.
      *     '?myFlag', { myFlag: [ "" ] }
      *     '?param=val, { param: [ "val" ] }
@@ -132,7 +132,7 @@ var gpUtil = function() {
      */
     function parseQueryString( queryString ) {
         if (!queryString) {
-            queryString= window.location.search
+            queryString= window.location.search;
         }
         // strip leading '?'
         if (queryString.charAt(0) == '?') {
@@ -166,6 +166,17 @@ var gpUtil = function() {
         return params;
     }
 
+    /**
+     * Check whether the string ends with the specified text
+     * @param string - the string to search for the suffix
+     * @param suffix - the text to search for
+     * @returns {boolean}
+     */
+    function endsWith(string, suffix) {
+        return string.length >= suffix.length
+            && string.substr(string.length - suffix.length) === suffix;
+    }
+
     // declare 'public' functions
     return {
         formatTimezone:formatTimezone,
@@ -174,6 +185,7 @@ var gpUtil = function() {
         formatTimeOfDay:formatTimeOfDay,
         initToggleDiv:initToggleDiv,
         toggleDiv:toggleDiv,
-        parseQueryString:parseQueryString 
+        parseQueryString:parseQueryString,
+        endsWith: endsWith
     };
 }();

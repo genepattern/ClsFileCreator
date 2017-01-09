@@ -4,46 +4,108 @@ var idIncrement = 0;
 var jobResultNumber = -1;
 var classNamesList = [];
 var selectedGpDir = null;
-
-
-if (typeof gp === 'undefined') {
-    gp = {};
-}
-gp.Util = function() {};
-
-gp.Util.endsWith = function(string, suffix) {
-    return string.length >= suffix.length
-        && string.substr(string.length - suffix.length) === suffix;
-};
+var gctFile; //URL to the gct file
+var gctFileName; //name of the gct file
+var requestParams;
+var gctFileContents = "";
 
 function generateNewId()
 {
     return ++idIncrement;
 }
 
-function displayLoadError(errorMsg)
+function displayLoadError(errorMessage, response)
 {
+    var errorMsg = errorMessage;
     $("#creator").empty();
-    $("#creator").append("<h3>There was an error loading the ClsFileCreator. Error: " + errorMsg +"</h3>");
+    $("#creator").append("<h3 style='color:red'>There was an error loading the ClsFileCreator: <p>Error: " + errorMsg +"</p></h3>");
 }
 
-function parseGCTFile(fileURL) {
-    $.ajax({
-        contentType: 'text/plain',
-        url: fileURL
-    }).done(function (response, status, xhr) {
-        loadSamples(response);
-    }).fail(function (response, status, xhr)
+function getFileContentsUsingByteRequests(fileURL, maxNumLines, startBytes, byteIncrement, fileContents, headers)
+{
+    var getMoreLines = false;
+
+    if(fileContents != undefined)
     {
-        displayLoadError(response.statusText);
+        gctFileContents = gctFileContents.concat(fileContents);
+    }
+
+    if(startBytes != undefined && startBytes >= 0)
+    {
+        var result = gctFileContents.match(/\r\n|\n|\r/g);
+        if(result == undefined || (result != null && result.length < maxNumLines))
+        {
+            getMoreLines = true;
+            gpLib.readBytesFromURL(fileURL, maxNumLines, startBytes, byteIncrement,
+            {
+                headers: headers,
+                successCallBack: getFileContentsUsingByteRequests,
+                failCallBack: displayLoadError
+            });
+        }
+    }
+
+    if(!getMoreLines)
+    {
+        if(gctFileContents != undefined && gctFileContents.length > 0)
+        {
+            loadSamples(gctFileContents);
+        }
+        else
+        {
+            displayLoadError("data is empty");
+        }
+    }
+}
+
+function parseGCTFile(fileURL)
+{
+    var headers = {};
+
+    if(gpLib.isGenomeSpaceFile(fileURL))
+    {
+        if(requestParams["|gst"] !== undefined && requestParams["|gsu"] !== undefined) {
+            headers = {
+                "gs-token": requestParams["|gst"].join(),  //should only be one item
+                "gs-username": requestParams["|gsu"].join()
+            };
+        }
+    }
+
+    var alternativeFileLoading = function()
+    {
+        gpLib.getDataAtUrl(fileURL,
+            {
+                headers: headers,
+                successCallBack: loadSamples,
+                failCallBack:  displayLoadError
+            });
+    };
+
+    gpLib.rangeRequestsAllowed(fileURL,
+    {
+        successCallBack: function(acceptRanges)
+        {
+            if(acceptRanges)
+            {
+                var fileContents = "";
+                //get the third data row in order to get the sample names
+                getFileContentsUsingByteRequests(fileURL, 3, 0, 5000, fileContents, headers);
+            }
+            else
+            {
+                alternativeFileLoading();
+            }
+        },
+        failCallBack: alternativeFileLoading
     });
 }
 
 function loadSamples(fileContents)
 {
-    var lines = fileContents.split(/\n/);
+    var lines = fileContents.split(/\r\n|\n|\r/);
 
-    if(lines.length >= 4 && lines[0].indexOf("#1.2") != -1)
+    if(lines.length >= 3 && lines[0].indexOf("#1.2") != -1)
     {
         //The samples
         var sampleLines = lines[2];
@@ -67,20 +129,30 @@ function listSamples(sampleNames)
     var controls = $("<div/>").attr("id", "sampleControls");
     controls.append($("<button class='btn'>Check All</button>").attr("id", "checkAllSamples").click(function()
     {
-        $("#sampleTable").find("input:checkbox").prop('checked', true); //.click();
+        $("#sampleTable").find("input:checkbox").prop('checked', true);
+        $("#sampleTable").find("input:checkbox").trigger("change");
+
     }));
 
     controls.append($("<button class='btn'>Uncheck All</button>").attr("id", "uncheckAllSamples").click(function()
     {
-        $("#sampleTable").find("input:checkbox").prop('checked', false); //.click();
+        $("#sampleTable").find("input:checkbox").prop('checked', false);
+        $("#sampleTable").find("input:checkbox").trigger("change");
     }));
 
     $("#step-1").append(controls);
 
     var table = $("<table/>").attr("id", "sampleTable");
+    var div = $("<div/>");
+    div.append(table);
+    $("#step-1").append(div);
+
     var tableRow = null;
 
-    var numRows = (sampleNames.length / 4 >> 0); //num columns is  4
+    var surplusRow = sampleNames.length % 4;
+    surplusRow = surplusRow > 0 ? 1: 0;
+
+    var numRows = (sampleNames.length / 4 >> 0) + surplusRow; //num columns is  4
     for(var r=0;r<numRows;r++)
     {
         tableRow = $("<tr/>");
@@ -93,7 +165,7 @@ function listSamples(sampleNames)
             {
                 tableRow.append("<td>" + (index + 1) + ".</td>");
 
-                var checkBox = $("<input type='checkbox'/>").click(function()
+                var checkBox = $("<input type='checkbox'/>").change(function()
                 {
                     var sampleIndex = $.inArray( $(this).data("sample"), selectedSamplesList);
 
@@ -113,58 +185,50 @@ function listSamples(sampleNames)
                     }
                 });
 
-                checkBox.data("sample", sampleNames[index]);
-                checkBox.click();
-
                 var tableData = $("<td/>");
                 tableData.append(checkBox);
+
                 tableData.append(sampleNames[index]);
                 tableRow.append(tableData);
+
+                checkBox.data("sample", sampleNames[index]);
+                checkBox.click();
             }
         }
-
     }
-
-    var div = $("<div/>");
-    div.append(table);
-    $("#step-1").append(div);
 }
 
 
 function defineClasses()
 {
-    var sampleRecords =  [];
-    for(var s=0;s<selectedSamplesList.length;s++)
-    {
-        sampleRecords.push({ recid: s, sample: selectedSamplesList[s]});
+    if( w2ui['classesGrid'] === undefined) {
+        var btn = w2obj.grid.prototype.buttons;
+        delete btn['reload'];
+        delete btn['columns'];
+        btn['search-go'].caption = w2utils.lang('Filter...');
+        btn['search-go'].hint = w2utils.lang('');
+
+        $('#classesGrid').w2grid({
+            name: 'classesGrid',
+            show: {
+                footer: true,
+                selectColumn: true,
+                lineNumbers: true
+            },
+            multiSelect: true,
+            columns: [
+                { field: 'recid', caption: 'Index'},
+                {field: 'class', caption: 'Class', size: '100%', editable: false, sortable: true }
+            ],
+            sortData: [
+                { field: 'recid', direction: 'asc' }
+            ]
+        });
     }
-
-    if( w2ui['classesGrid'] !== undefined)
+    else
     {
-        w2ui['classesGrid'].destroy();
+        w2ui['classesGrid'].resize()
     }
-
-    var btn = w2obj.grid.prototype.buttons;
-    delete btn['reload'];
-    delete btn['columns'];
-    btn['search-go'].caption = w2utils.lang('Filter...');
-    btn['search-go'].hint = w2utils.lang('');
-
-    $('#classesGrid').w2grid({
-        name   : 'classesGrid',
-        show: {
-            footer: true,
-            selectColumn: true,
-            lineNumbers    : true
-        },
-        multiSelect : true,
-        columns: [
-            { field: 'recid', caption: 'Index'},
-            {field: 'class', caption: 'Class', size: '100%', editable: false }
-        ],
-        sortData: [{ field: 'recid', direction: 'ASC' },
-            { field: 'class', direction: 'ASC' }]
-    });
 
     if( w2ui['classToolbar'] == undefined) {
         $('#classToolbar').w2toolbar({
@@ -176,7 +240,6 @@ function defineClasses()
                         '</div>'
                 },
                 { type: 'button', id: 'add', caption: 'Add Class', icon: 'w2ui-icon-plus' },
-                { type: 'break', id: 'break1' },
                 { type: 'button', id: 'delete', caption: 'Delete Class', icon: 'w2ui-icon-cross' }//,
             ],
             onClick: function (event) {
@@ -187,6 +250,7 @@ function defineClasses()
                             //only add this class if it does not already exist
                             if (w2ui['classesGrid'].find({ class: className }) == 0) {
                                 w2ui['classesGrid'].add({ recid: generateNewId(), class: className});
+                                w2ui['classesGrid'].sort('class', 'asc');
                             }
                             else {
                                 w2popup.open({
@@ -199,12 +263,22 @@ function defineClasses()
                                     modal: false
                                 });
                             }
-                            classNamesList.unshift(className);
+                            classNamesList.push(className);
 
                             $("#tb_classToolbar_item_delete").removeAttr("disabled");
                         }
 
                         $("#classInput").val("");
+
+                        //a critical change was made so disable next steps
+                        // and hide any errors in those steps
+                        $("#creator").smartWizard("disableStep", 3);
+                        $("#creator").smartWizard("disableStep", 4);
+                        $("#creator").smartWizard("disableStep", 5);
+
+                        $("#creator").smartWizard("hideError", 3);
+                        $("#creator").smartWizard("hideError", 4);
+                        $("#creator").smartWizard("hideError", 5);
                         break;
                     case 'delete':
                         var selectedClasses = w2ui['classesGrid'].getSelection();
@@ -213,13 +287,9 @@ function defineClasses()
                             var clssName = w2ui['classesGrid'].get(selectedClasses[c]).class;
                             w2ui['classesGrid'].remove(selectedClasses[c]);
 
-                            //remove the class from the list of assign classes
-                           // var classNameIndex = classNamesList.indexOf(clssName);
-                           // classNamesList.slice(classNameIndex, 1);
-
                             classNamesList.splice($.inArray(clssName, classNamesList),1);
 
-                            console.log("deleted class" + clssName);
+                            console.log("deleted class " + clssName);
                         }
 
                         if(classNamesList.length == 0)
@@ -227,6 +297,15 @@ function defineClasses()
                             $("#tb_classToolbar_item_delete").attr("disabled", "disabled");
                         }
 
+                        //a critical change was made so disable next steps
+                        // and hide any errors in those steps
+                        $("#creator").smartWizard("disableStep", 3);
+                        $("#creator").smartWizard("disableStep", 4);
+                        $("#creator").smartWizard("disableStep", 5);
+
+                        $("#creator").smartWizard("hideError", 3);
+                        $("#creator").smartWizard("hideError", 4);
+                        $("#creator").smartWizard("hideError", 5);
                         break;
                 }
             }
@@ -254,77 +333,115 @@ function defineClasses()
 function assignSamplesToClasses()
 {
     var sampleRecords =  [];
-    for(var s=0;s<selectedSamplesList.length;s++)
+    for(var s=0;s<sampleNamesList.length;s++)
     {
-        sampleRecords.push({ recid: s, sample: selectedSamplesList[s]});
+        //find index of sample
+        var sampleIndex = $.inArray( sampleNamesList[s], selectedSamplesList);
+
+        if(sampleIndex !== -1)
+        {
+            sampleRecords.push({ recid: s, sample: sampleNamesList[s]});
+        }
     }
 
     //delete any existing samples grid
-    if( w2ui['sampleAndClassGrid'] !== undefined)
+    if( w2ui['sampleAndClassGrid'] == undefined)
     {
-        w2ui['sampleAndClassGrid'].destroy();
-        w2ui['sampleGrid'].destroy();
+        var btn = w2obj.grid.prototype.buttons;
+        delete btn['reload'];
+        delete btn['columns'];
+
+        $('#sampleGrid').w2grid({
+            name   : 'sampleGrid',
+            header: 'Samples',
+            show: {
+                selectColumn: true,
+                toolbar: true,
+                footer: true,
+                header: true,
+                lineNumbers: true
+            },
+            multiSearch: true,
+            searches: [
+                { field: 'sample', caption: 'Sample Name', type: 'text' }
+            ],
+            columns: [
+                { field: 'recid', caption: 'Index', sortable: true},
+                {field: 'sample', caption: 'Sample Name', size: '100%', sortable: true}
+            ],
+            sortData: [{ field: 'recid', direction: 'asc' },
+                { field: 'sample', direction: 'asc' }],
+            records: sampleRecords
+        });
+
+        $('#sampleAndClassGrid').w2grid({
+            name   : 'sampleAndClassGrid',
+            show: {
+                selectColumn: true,
+                toolbar: false,
+                footer: true,
+                lineNumbers: true
+            },
+            multiSearch: false,
+            searches: [
+                { field: 'class', caption: 'Class', type: 'text' }
+            ],
+            columns: [
+                { field: 'recid', caption: 'Index'},
+                {field: 'sample', caption: 'Sample Name', size: '100%' },
+                { field: 'class', caption: 'Class', type: 'text' }
+            ],
+            sortData: [{ field: 'recid', direction: 'ASC' }
+            ]
+        });
     }
-
-    var btn = w2obj.grid.prototype.buttons;
-    delete btn['reload'];
-    delete btn['columns'];
-
-    $('#sampleGrid').w2grid({
-        name   : 'sampleGrid',
-        header: 'Samples',
-        show: {
-            selectColumn: true,
-            toolbar: true,
-            footer: true,
-            header: true,
-            lineNumbers: true
-        },
-        multiSearch: true,
-        searches: [
-            { field: 'sample', caption: 'Sample Name', type: 'text' }
-        ],
-        columns: [
-            { field: 'recid', caption: 'Index'},
-            {field: 'sample', caption: 'Sample Name', size: '100%' }
-        ],
-        sortData: [{ field: 'recid', direction: 'ASC' },
-            { field: 'sample', direction: 'ASC' }],
-        records: sampleRecords
-    });
-
-    $('#sampleAndClassGrid').w2grid({
-        name   : 'sampleAndClassGrid',
-        show: {
-            selectColumn: true,
-            toolbar: true,
-            footer: true,
-            lineNumbers: true//,
-        },
-        multiSearch: false,
-        searches: [
-            { field: 'sample', caption: 'Sample Name', type: 'text' },
-            { field: 'class', caption: 'Class', type: 'text' }
-        ],
-        columns: [
-            { field: 'recid', caption: 'Index'},
-            {field: 'sample', caption: 'Sample Name', size: '100%' },
-            { field: 'class', caption: 'Class', type: 'text' }
-        ],
-        sortData: [{ field: 'recid', direction: 'ASC' },
-            { field: 'sample', direction: 'ASC' },
-            { field: 'class', direction: 'ASC' }]
-    });
+    else
+    {
+        w2ui['sampleAndClassGrid'].resize();
+        w2ui['sampleGrid'].resize();
+    }
 
     w2ui['sampleAndClassGrid'].hideColumn('recid');
     w2ui['sampleAndClassGrid'].hideColumn('class');
 
-    $('#selectedClass').w2field('list', { items: classNamesList, selected: classNamesList[0] });
-    $('#selectedClass').change(function()
+    $("#selectedClass").empty();
+
+    for(var i=0;i<classNamesList.length;i++)
+    {
+        var numSamplesInClass = w2ui['sampleAndClassGrid'].find({ class:  classNamesList[i] }).length;
+        $("#selectedClass").append('<option value="'+ classNamesList[i] +'">' +classNamesList[i] + "("+ numSamplesInClass + ")" +"</option>");
+    }
+
+    var sampleAndClassRecords =  w2ui['sampleAndClassGrid'].records;
+    var recordsToRemove = [];
+
+    var newSamplesAndClasses = [];
+    for(var r=0;r< sampleAndClassRecords.length;r++)
+    {
+        var classAssignment = sampleAndClassRecords[r].class;
+        if($.inArray(classAssignment, classNamesList) == -1)
+        {
+            recordsToRemove.push(sampleAndClassRecords[r].recid);
+            newSamplesAndClasses.push(
+            {
+                recid: sampleAndClassRecords[r].recid,
+                sample: sampleAndClassRecords[r].sample
+            });
+        }
+    }
+
+    w2ui['sampleGrid'].add(newSamplesAndClasses);
+
+    for(var v=0;v<recordsToRemove.length;v++)
+    {
+        w2ui['sampleAndClassGrid'].remove(recordsToRemove[v]);
+    }
+
+    $("#selectedClass").change(function()
     {
         //show only samples with this class
-        //w2ui['sampleAndClassGrid'].hideSearch('class');
-        w2ui['sampleAndClassGrid'].search("class", $(this).val());
+        var className = $(this).val();
+        w2ui['sampleAndClassGrid'].search([{field: "class", value: className, operator: "is"}]);
         w2ui['sampleAndClassGrid'].hideSearch('class');
     });
 
@@ -345,7 +462,7 @@ function classAssignmentsSummary()
     });
 
     var classRecords =  w2ui['classesGrid'].records;
-    for(var r=0;r<classRecords.length;r++)
+    for(var r=0;r< classRecords.length;r++)
     {
         var className = classRecords[r].class;
 
@@ -353,9 +470,9 @@ function classAssignmentsSummary()
         var assignSamples = w2ui['sampleAndClassGrid'].find(
             { class:  className });
 
-        for(var a=0;a<assignSamples.length;a++)
+        for(var a=assignSamples.length-1; a >= 0;a--)
         {
-            if(a != 0)
+            if(a != (assignSamples.length - 1))
             {
                 samplesList += ", ";
             }
@@ -388,7 +505,9 @@ function createCls()
     text += "\n";
 
     var sampleRecords = w2ui['sampleAndClassGrid'].records;
-    for(var s=0;s<sampleRecords.length;s++)
+
+    //samples are added reverse order so need to traverse the list backwards
+    for(var s=sampleRecords.length-1;s>=0;s--)
     {
         var className = sampleRecords[s].class;
         var index = classNamesList.indexOf(className);
@@ -405,10 +524,11 @@ function createCls()
             });
         }
 
-        if(s !== 0)
+        if(s !== sampleRecords.length-1)
         {
             text += " ";
         }
+
         text += index;
     }
     return text;
@@ -428,23 +548,31 @@ function init()
     $("#creator").smartWizard({
         keyNavigation: false,
         labelFinish: "Save",
+        noForwardJumping: true,
         onLeaveStep : function(obj, context)
         {
+            if(context.fromStep > context.toStep)
+            {
+                //$("#creator").smartWizard("enableFinish", false);
+                $(".buttonFinish").addClass("buttonDisabled");
+            }
+
             if(context.fromStep == 1 && context.toStep == 2)
             {
+                //$("#step-2").find(".StepTitle").after("<span>Loaded: " + gctFileName + "</span>");
+
                 if (selectedSamplesList.length == 0)
                 {
                     $("#creator").smartWizard("showError", 1);
                     $("#creator").smartWizard('showMessage', 'Error: No samples selected!');
                     return false;
                 }
-
-                //reset the list of class names
-                classNamesList = [];
             }
 
             if(context.fromStep == 2 && context.toStep == 3)
             {
+                //$("#step-3").find(".StepTitle").after("<span>Loaded: " + gctFileName + "</span>");
+
                 if(classNamesList.length == 0)
                 {
                     $("#creator").smartWizard("showError", 2);
@@ -455,6 +583,8 @@ function init()
 
             if(context.fromStep == 3 && context.toStep == 4)
             {
+                //$("#step-4").find(".StepTitle").after("<span>Loaded: " + gctFileName + "</span>");
+
                 if(w2ui['sampleGrid'].records.length !==0)
                 {
                     var numMissing = w2ui['sampleGrid'].records.length;
@@ -482,7 +612,7 @@ function init()
                 return;
             }
 
-            if (!gp.Util.endsWith(clsFileName.toLowerCase(), '.cls')) {
+            if (!gpUtil.endsWith(clsFileName.toLowerCase(), '.cls')) {
                 clsFileName += '.cls';
             }
 
@@ -502,9 +632,6 @@ function init()
                 }
                 else
                 {
-                    $("#creator").smartWizard("hideError", 5);
-                    $("#creator").smartWizard('hideMessage');
-
                     $('#gpDir').w2tag("");
                 }
 
@@ -513,11 +640,18 @@ function init()
 
                 var saveLocation = selectedGpDir + clsFileName;
                 console.log("save location: " + saveLocation);
-                uploadData(saveLocation, text, function(result)
+                gpLib.uploadDataToFilesTab(saveLocation, text, function(message)
                 {
-                    if(result !== "success")
+                    if(message !== "success")
                     {
-                        $("#creator").smartWizard('showMessage', "Error saving file. " + result);
+                        console.log("Error saving file: " + message);
+                        //limit the length of the error message on the screen
+                        if(message.length > 300)
+                        {
+                            message = message.substring(0, 300);
+                        }
+
+                        $("#creator").smartWizard('showMessage', "Error saving file. " + message);
                     }
                     else
                     {
@@ -531,7 +665,7 @@ function init()
 
                 downloadFile(clsFileName, clsText);
 
-                $("#creator").smartWizard('showMessage', 'File ' + clsFileName + ' downloaded.');
+                $("#creator").smartWizard('showMessage', 'File ' + clsFileName + ' created.');
             }
             else
             {
@@ -540,9 +674,33 @@ function init()
             }
             return true;
         },
-        onShowStep : function(obj, context)
-        {
-            if(context.fromStep == 1 && context.toStep == 2)
+        onShowStep : function(obj, context) {
+            if (context.toStep == 2) {
+                $("#creator").smartWizard("disableStep", 1);
+            }
+            if (context.toStep == 3) {
+                $("#creator").smartWizard("disableStep", 1);
+                $("#creator").smartWizard("disableStep", 2);
+            }
+            if (context.toStep == 4) {
+                $("#creator").smartWizard("disableStep", 1);
+                $("#creator").smartWizard("disableStep", 2);
+                $("#creator").smartWizard("disableStep", 3);
+            }
+            if (context.toStep == 5) {
+                $("#creator").smartWizard("disableStep", 1);
+                $("#creator").smartWizard("disableStep", 2);
+                $("#creator").smartWizard("disableStep", 3);
+                $("#creator").smartWizard("disableStep", 4);
+            }
+
+            if(context.toStep != 5)
+            {
+                //$("#creator").smartWizard("enableFinish", false);
+                $(".buttonFinish").addClass("buttonDisabled");
+            }
+
+            if(context.toStep == 2)
             {
                 defineClasses();
             }
@@ -557,8 +715,37 @@ function init()
         }
     });
 
+    // Hide the previous button
+    $(".buttonPrevious").hide();
+
+    var updateNumSamplesAssigned = function(className, length)
+    {
+        var numExistingSamplesInClass = $('#selectedClass').data(className+"Size");
+        if(numExistingSamplesInClass === undefined)
+        {
+            numExistingSamplesInClass = 0;
+        }
+        else
+        {
+            numExistingSamplesInClass = parseInt(numExistingSamplesInClass);
+        }
+        var numSamplesInClass = length + numExistingSamplesInClass;
+
+        $("#selectedClass").find("option[value='"+ $("#selectedClass").val() +"']").text(className + " (" + numSamplesInClass + ")" );
+
+        $("#selectedClass").data(className+"Size", numSamplesInClass);
+    };
+
     $("#assignClassBtn").click(function()
     {
+        //a critical change was made so disable next steps
+        // and hide any errors in those steps
+        $("#creator").smartWizard("disableStep", 4);
+        $("#creator").smartWizard("disableStep", 5);
+
+        $("#creator").smartWizard("hideError", 4);
+        $("#creator").smartWizard("hideError", 5);
+
         var className = $("#selectedClass").val();
 
         var selectedSamples = w2ui['sampleGrid'].getSelection();
@@ -578,28 +765,50 @@ function init()
             w2ui['sampleGrid'].remove(w2ui['sampleGrid'].get(selectedSamples[s]).recid);
         }
 
-        w2ui['sampleGrid'].selectNone();
+        w2ui['sampleGrid'].reset();
+
+        //var classNameIndex = $.inArray(className, classNamesList);
+        //var list = classNamesList.slice();
+
+        updateNumSamplesAssigned(className, selectedSamples.length);
     });
 
     $("#unassignClassBtn").click(function()
     {
+        //a critical change was made so disable next steps
+        // and hide any errors in those steps
+        $("#creator").smartWizard("disableStep", 4);
+        $("#creator").smartWizard("disableStep", 5);
+
+        $("#creator").smartWizard("hideError", 4);
+        $("#creator").smartWizard("hideError", 5);
+
         var selectedSamples = w2ui['sampleAndClassGrid'].getSelection();
 
-        for(var s=0;s<selectedSamples.length;s++)
-        {
-            var node =  w2ui['sampleAndClassGrid'].get(selectedSamples[s]);
-            var recordId = node.recid;
-            w2ui['sampleGrid'].add(
-                {
-                    recid: recordId,
-                    sample: node.sample
-                });
+        if(selectedSamples.length > 0) {
+            var className = "";
+            for (var s = 0; s < selectedSamples.length; s++) {
+                var node = w2ui['sampleAndClassGrid'].get(selectedSamples[s]);
+                var recordId = node.recid;
+                className = node.class;
+                w2ui['sampleGrid'].add(
+                    {
+                        recid: recordId,
+                        sample: node.sample
+                    });
 
-            //remove it from the samples grid
-            w2ui['sampleAndClassGrid'].remove(recordId);
+                //remove it from the samples grid
+                w2ui['sampleAndClassGrid'].remove(recordId);
+            }
+
+            //decrease the tally of number of samples in the class by
+            // the number of samples just removed above
+            // var existingSamplesInClass = $("#selectedClass").data(className+"Size");
+            //("#selectedClass").data(className+"Size", existingSamplesInClass - selectedSamples.length);
+            w2ui['sampleAndClassGrid'].selectNone();
+
+            updateNumSamplesAssigned(className, Math.abs(selectedSamples.length) * -1);
         }
-
-        w2ui['sampleAndClassGrid'].selectNone();
     });
 
     $("#selectGpDir").hide();
@@ -613,18 +822,20 @@ function init()
         {
             $("#selectGpDir").hide();
         }
+
+        $(".buttonFinish").removeClass("buttonDisabled");
     });
 
     $("#gpDir").click(function()
     {
-        saveToGPDialog(function(selectedDir)
+        gpLib.saveToGPDialog(function(selectedDir)
         {
             $("#selectedDir").empty();
             selectedGpDir = null;
 
             if(selectedDir.url !== undefined)
             {
-                $("#selectedDir").text("Directory:" + selectedDir.url);
+                $("#selectedDir").text("Directory: " + decodeURIComponent(selectedDir.url));
                 selectedGpDir = selectedDir.url;
                 $('#gpDir').w2tag("");
             }
@@ -637,8 +848,7 @@ function init()
 }
 $(function()
 {
-
-    var requestParams = gpUtil.parseQueryString();
+    requestParams = gpUtil.parseQueryString();
 
     jobResultNumber = requestParams["job.number"];
 
@@ -656,6 +866,23 @@ $(function()
         for (var t = 0; t < inputFiles.length; t++)
         {
             console.log("input file: " + inputFiles[t]);
+            gctFile = inputFiles[t];
+
+            //set the name of the gct file
+            var parser = $('<a/>');
+            parser.attr("href", gctFile);
+
+            gctFileName = parser[0].pathname.substring(parser[0].pathname.lastIndexOf('/')+1);
+            //set the basename of the output cls file
+
+            var extension = gctFileName.substring(gctFileName.length-4);
+            if(extension.toLowerCase() === ".gct")
+            {
+                $("#clsFileName").val(gctFileName.replace(extension, ".cls"));
+            }
+
+            $("#fileLoaded").append("<span>Loaded: <a href='" + gctFile + "' target='blank'>" + decodeURIComponent(gctFileName) +" </a></span>");
+
             parseGCTFile(inputFiles[t]);
         }
     }
