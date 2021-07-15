@@ -1,7 +1,5 @@
 #ClsFileCreator
-#Wed Apr 08 13:14:00 EDT 2015
-JVMLevel=
-author=Marc-Danie Nazaire(Broad Institute)
+author=Marc-Danie Nazaire (Broad Institute)
 categories=Preprocess & Utilities
 commandLine=clsfilecreator.html ? <input.file>
 cpuType=any
@@ -10,6 +8,8 @@ fileFormat=
 language=Java
 name=ClsFileCreator
 os=any
+repo.src=https://github.com/genepattern/ClsFileCreator.git
+
 p1_MODE=IN
 p1_TYPE=FILE
 p1_default_value=
@@ -22,7 +22,7 @@ p1_type=java.io.File
 p1_value=
 pipelineModel=
 privacy=public
-publicationDate=04/08/2015 13\:04 
+publicationDate=07/15/2021 13\:04 
 quality=production
 requiredPatchLSIDs=urn\:lsid\:broadinstitute.org\:plugin\:GenePattern_3_9_3\:1,
 requiredPatchURLs=http\://www.broadinstitute.org/webservices/gpModuleRepository/download/prod/patch/?file\=/GenePattern_3_9_3/broadinstitute.org\:plugin/GenePattern_3_9_3/1/GenePattern_3_9_3.zip
@@ -30,4 +30,4 @@ serializedModel=
 taskDoc=doc.html
 taskType=javascript
 userid=GenePattern (gp-help@broadinstitute.org)
-version=JavaScript implementation
+version=S3 file fix
